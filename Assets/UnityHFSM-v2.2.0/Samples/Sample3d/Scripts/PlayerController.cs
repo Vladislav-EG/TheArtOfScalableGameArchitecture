@@ -37,7 +37,7 @@ namespace UnityHFSM.Samples.Sample3d
                 Input.GetAxis("Vertical")
             );
 
-            rb.velocity = playerInput * speed;
+            rb.linearVelocity = playerInput * speed;
         }
 
         private void OnDestroy()

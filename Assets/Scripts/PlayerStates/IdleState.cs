@@ -9,17 +9,17 @@ namespace PlayerStates
 
         public override void OnEnter()
         {
-            Debug.Log("Enter IdleState");
+            DebugColorLog.LogEnter<IdleState>();
         }
-        
+
         public override void OnLogic()
         {
             // Idle logic
         }
-        
+
         public override void OnExit()
         {
-            Debug.Log("Exit IdleState");
+            DebugColorLog.LogExit<IdleState>();
         }
     }
     
@@ -29,17 +29,17 @@ namespace PlayerStates
 
         public override void OnEnter()
         {
-            Debug.Log("Enter WalkState");
+            DebugColorLog.LogEnter<WalkState>();
         }
-        
+
         public override void OnLogic()
         {
-            // Idle logic
+            // Walk logic
         }
-        
+
         public override void OnExit()
         {
-            Debug.Log("Exit WalkState");
+            DebugColorLog.LogExit<WalkState>();
         }
     }
     
@@ -49,37 +49,53 @@ namespace PlayerStates
 
         public override void OnEnter()
         {
-            Debug.Log("Enter JumpState");
+            DebugColorLog.LogEnter<JumpState>();
         }
-        
+
         public override void OnLogic()
         {
-            // Idle logic
+            // Jump logic
         }
-        
+
         public override void OnExit()
         {
-            Debug.Log("Exit JumpState");
+            DebugColorLog.LogExit<JumpState>();
         }
     }
     
-    public class JumpWalk : StateBase<string>
+    public class FallState : StateBase<string>
     {
-        public JumpWalk() : base(needsExitTime: false) { }
+        public FallState() : base(needsExitTime: false) { }
 
         public override void OnEnter()
         {
-            Debug.Log("Enter JumpWalk");
+            DebugColorLog.LogEnter<FallState>();
         }
-        
+
         public override void OnLogic()
         {
-            // Idle logic
+            // Fall logic
         }
-        
+
         public override void OnExit()
         {
-            Debug.Log("Exit JumpWalk");
+            DebugColorLog.LogExit<FallState>();
         }
+    }
+}
+
+
+public static class DebugColorLog
+{
+    public static void LogEnter<T>() where T : class
+    {
+        string stateName = typeof(T).Name;
+        Debug.Log($"<color=green>Enter {stateName}</color>");
+    }
+
+    public static void LogExit<T>() where T : class
+    {
+        string stateName = typeof(T).Name;
+        Debug.Log($"<color=red>Exit {stateName}</color>");
     }
 }

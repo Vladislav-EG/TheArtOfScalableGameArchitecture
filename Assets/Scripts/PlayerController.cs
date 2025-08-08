@@ -5,6 +5,10 @@ using UnityHFSM;
 
 public class PlayerController : MonoBehaviour
 {
+    [SerializeField] private Rigidbody2D _rigidbody;
+    [SerializeField] private BoxCollider2D _boxCollider;
+    [SerializeField] private LayerMask layerMask;
+
     private StateMachine _stateMachine;
     private StateMachine _groundedStateMachine;
     private StateMachine _jumpingStateMachine;
@@ -13,15 +17,15 @@ public class PlayerController : MonoBehaviour
     private WalkState _walkState;
     private JumpState _jumpState;
     private FallState _fallState;
-
-
+    private DashState _dashState;
 
     private void Awake()
     {
         _idleState = new IdleState();
-        _walkState = new WalkState();
-        _jumpState = new JumpState();
+        _walkState = new WalkState(_rigidbody);
+        _jumpState = new JumpState(_rigidbody, transform);
         _fallState = new FallState();
+        _dashState = new DashState(_rigidbody, transform);
 
         _stateMachine = new StateMachine(); 
         _groundedStateMachine = new StateMachine();
@@ -37,6 +41,7 @@ public class PlayerController : MonoBehaviour
         
         _stateMachine.AddState("Grounded", _groundedStateMachine);
         _stateMachine.AddState("Jumping", _jumpingStateMachine);
+        _stateMachine.AddState("Dash", _dashState);
 
 
         _groundedStateMachine.AddTransition("Grounded", "Idle", t => Input.GetAxisRaw("Horizontal") == 0);
@@ -48,47 +53,29 @@ public class PlayerController : MonoBehaviour
         _groundedStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
 
         _stateMachine.AddTransition("Grounded", "Jumping",    t => Input.GetKeyDown("space"));
-        _jumpingStateMachine.AddTransition("Jump", "Fall",    t => Input.GetKeyUp("space"));
+        
+        _jumpingStateMachine.AddExitTransition("Fall", t => _boxCollider.IsTouchingLayers(layerMask));
+        
+        _jumpingStateMachine.AddTransition("Jumping", "Jump",    t => Input.GetKey("space"));
+        _jumpingStateMachine.AddTransition("Jumping", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
+
+        _jumpingStateMachine.AddTransition("Jump", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
 
         // _stateMachine.AddTransition(new TransitionAfter("Fall", "Grounded", 0.5f));
-        _stateMachine.AddTransition(new TransitionAfter("Jumping", "Grounded", 0.5f));
+        _stateMachine.AddTransition("Jumping", "Grounded", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
+        
+        _stateMachine.AddTransition("Jumping", "Dash", t => Input.GetKeyDown("o"));
+        _stateMachine.AddTransition("Grounded", "Dash", t => Input.GetKeyDown("o"));
+        _stateMachine.AddTransition("Dash", "Jumping", t => !_boxCollider.IsTouchingLayers(layerMask));
+        _stateMachine.AddTransition("Dash", "Grounded", t => _boxCollider.IsTouchingLayers(layerMask));
 
-            
+
+
         _groundedStateMachine.SetStartState("Grounded");
         _jumpingStateMachine.SetStartState("Jumping");
 
         _stateMachine.SetStartState("Grounded");
         _stateMachine.Init();
-
-        
-        // var fightFsm = new HybridStateMachine(
-        //     beforeOnLogic: state => Debug.Log("ASD")
-        //     );
-
-        // _jumpStateMachine = new StateMachine();
-        // _stateMachine.AddState("JumpState", _jumpStateMachine);
-        //
-        // _jumpStateMachine.AddState("Jump", _jumpState);
-        // _jumpStateMachine.AddState("JumpWalk", _jumpWalkState);
-        //
-        // _jumpStateMachine.SetStartState("Jump"); // FIXME
-        //
-        // _stateMachine.AddState("Idle", _idleState);
-        // _stateMachine.AddState("Walk", _walkState);
-        //
-        // _stateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
-        // _stateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
-        // _stateMachine.AddTransition("Idle", "JumpState",    t => Input.GetKeyDown("space"));
-        // _jumpStateMachine.AddTransition("Jump", "JumpWalk",    t => Input.GetAxisRaw("Horizontal") != 0);
-        // _stateMachine.AddTransition("JumpState", "Idle",    t => Input.GetKeyUp("space"));
-        // _stateMachine.AddTransition("JumpState", "Idle",    t => Input.GetKeyUp("space"));
-        
-        // _stateMachine.AddTransition("Idle", "Jump",    t => Input.GetKeyDown("Space"));
-
-        //
-        // _stateMachine.SetStartState("Idle");
-        //
-        // _stateMachine.Init();
     }
 
     private void Update()

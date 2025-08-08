@@ -25,7 +25,12 @@ namespace PlayerStates
     
     public class WalkState : StateBase<string>
     {
-        public WalkState() : base(needsExitTime: false) { }
+        private readonly Rigidbody2D _rigidbody2D;
+        
+        public WalkState(Rigidbody2D rigidbody2D) : base(needsExitTime: false)
+        {
+            _rigidbody2D = rigidbody2D;
+        }
 
         public override void OnEnter()
         {
@@ -34,7 +39,9 @@ namespace PlayerStates
 
         public override void OnLogic()
         {
-            // Walk logic
+            var moveVelocity = Input.GetAxis("Horizontal");
+
+            _rigidbody2D.linearVelocity = new Vector2(moveVelocity * 5f, 0f);
         }
 
         public override void OnExit()
@@ -45,21 +52,59 @@ namespace PlayerStates
     
     public class JumpState : StateBase<string>
     {
-        public JumpState() : base(needsExitTime: false) { }
+        private readonly Rigidbody2D _rigidbody2D;
+        private readonly Transform _transform;
+
+        public JumpState(Rigidbody2D rigidbody2D, Transform transform) : base(needsExitTime: false)
+        {
+            _rigidbody2D = rigidbody2D;
+            _transform = transform;
+        }
 
         public override void OnEnter()
         {
             DebugColorLog.LogEnter<JumpState>();
+            _rigidbody2D.AddForce(_transform.up * 8f, ForceMode2D.Impulse);
+
         }
 
         public override void OnLogic()
         {
-            // Jump logic
+            
         }
 
         public override void OnExit()
         {
             DebugColorLog.LogExit<JumpState>();
+        }
+    }
+    
+    public class DashState : StateBase<string>
+    {
+        private readonly Rigidbody2D _rigidbody2D;
+        private readonly Transform _transform;
+
+        public DashState(Rigidbody2D rigidbody2D, Transform transform) : base(needsExitTime: false)
+        {
+            _rigidbody2D = rigidbody2D;
+            _transform = transform;
+        }
+
+        public override void OnEnter()
+        {
+            DebugColorLog.LogEnter<DashState>();
+            _rigidbody2D.AddForce(_transform.right * 5f, ForceMode2D.Impulse);
+
+        }
+
+        public override void OnLogic()
+        {
+            
+        }
+
+        public override void OnExit()
+        {
+            DebugColorLog.LogExit<DashState>();
         }
     }
     

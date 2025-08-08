@@ -1,9 +1,10 @@
+using System.Security.Cryptography;
 using UnityEngine;
 using UnityHFSM;
 
 namespace PlayerStates
 {
-    public class IdleState : StateBase<string>
+    public class IdleState : ActionStateWithFixed
     {
         public IdleState() : base(needsExitTime: false) { }
 
@@ -15,15 +16,21 @@ namespace PlayerStates
         public override void OnLogic()
         {
             // Idle logic
+            UnityEngine.Debug.Log("Update");
         }
-
+        
+        public override void OnFixedLogic()
+        {
+            UnityEngine.Debug.Log("FixedUpdate");
+        }
+        
         public override void OnExit()
         {
             DebugColorLog.LogExit<IdleState>();
         }
     }
     
-    public class WalkState : StateBase<string>
+    public class WalkState : ActionStateWithFixed
     {
         private readonly Rigidbody2D _rigidbody2D;
         
@@ -48,9 +55,13 @@ namespace PlayerStates
         {
             DebugColorLog.LogExit<WalkState>();
         }
+        
+        public override void OnFixedLogic()
+        {
+        }
     }
     
-    public class JumpState : StateBase<string>
+    public class JumpState : ActionStateWithFixed
     {
         private readonly Rigidbody2D _rigidbody2D;
         private readonly Transform _transform;
@@ -77,9 +88,13 @@ namespace PlayerStates
         {
             DebugColorLog.LogExit<JumpState>();
         }
+        
+        public override void OnFixedLogic()
+        {
+        }
     }
     
-    public class DashState : StateBase<string>
+    public class DashState : ActionStateWithFixed
     {
         private readonly Rigidbody2D _rigidbody2D;
         private readonly Transform _transform;
@@ -106,9 +121,13 @@ namespace PlayerStates
         {
             DebugColorLog.LogExit<DashState>();
         }
+        
+        public override void OnFixedLogic()
+        {
+        }
     }
     
-    public class FallState : StateBase<string>
+    public class FallState : ActionStateWithFixed
     {
         public FallState() : base(needsExitTime: false) { }
 
@@ -126,9 +145,13 @@ namespace PlayerStates
         {
             DebugColorLog.LogExit<FallState>();
         }
+        
+        public override void OnFixedLogic()
+        {
+        }
     }
     
-    public class CrouchState : StateBase<string>
+    public class CrouchState : ActionStateWithFixed
     {
         public CrouchState() : base(needsExitTime: false) { }
 
@@ -146,9 +169,13 @@ namespace PlayerStates
         {
             DebugColorLog.LogExit<CrouchState>();
         }
+        
+        public override void OnFixedLogic()
+        {
+        }
     }
     
-    public class IdleCrouchState : StateBase<string>
+    public class IdleCrouchState : ActionStateWithFixed
     {
         public IdleCrouchState() : base(needsExitTime: false) { }
 
@@ -165,6 +192,10 @@ namespace PlayerStates
         public override void OnExit()
         {
             DebugColorLog.LogExit<IdleCrouchState>();
+        }
+        
+        public override void OnFixedLogic()
+        {
         }
     }
 }

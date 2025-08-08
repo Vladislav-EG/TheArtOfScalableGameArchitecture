@@ -1,4 +1,5 @@
 
+using UnityEngine;
 using UnityHFSM.Inspection;
 
 namespace UnityHFSM
@@ -53,6 +54,11 @@ namespace UnityHFSM
 		{
 
 		}
+		
+		// public virtual void OnFixedUpdate()
+		// {
+		//
+		// }
 
 		/// <summary>
 		/// Called when the state machine transitions from this state to another state (exits this state).
@@ -61,7 +67,7 @@ namespace UnityHFSM
 		{
 
 		}
-
+		
 		/// <summary>
 		/// (Only if <c>needsExitTime</c> is true):
 		/// 	Called when a state transition from this state to another state should happen.

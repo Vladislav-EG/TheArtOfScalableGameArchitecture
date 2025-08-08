@@ -11,7 +11,7 @@ public class PlayerController : MonoBehaviour
 
     private StateMachine _stateMachine;
     private StateMachine _groundedStateMachine;
-    private StateMachine _jumpingStateMachine;
+    private StateMachine _airborneStateMachine;
     private StateMachine _crouchingStateMachine;
     private StateMachine _standingStateMachine;
     
@@ -22,10 +22,7 @@ public class PlayerController : MonoBehaviour
     private DashState _dashState;
     private CrouchState _crouchState;
     private IdleCrouchState _idleCrouchState;
-
-
-
-
+    
     private void Awake()
     {
         _idleState = new IdleState();
@@ -38,12 +35,12 @@ public class PlayerController : MonoBehaviour
 
         _stateMachine = new StateMachine(); 
         _groundedStateMachine = new StateMachine();
-        _jumpingStateMachine = new StateMachine();
+        _airborneStateMachine = new StateMachine();
         _standingStateMachine = new StateMachine();
         _crouchingStateMachine = new StateMachine();
         
         _stateMachine.AddState("Grounded", _groundedStateMachine);
-        _stateMachine.AddState("Jumping", _jumpingStateMachine);
+        _stateMachine.AddState("Airborne", _airborneStateMachine);
         _stateMachine.AddState("Dash", _dashState);
         
         _groundedStateMachine.AddState("Grounded", onEnter: state => Debug.Log("Grounded"), isGhostState: true);
@@ -57,14 +54,13 @@ public class PlayerController : MonoBehaviour
         _crouchingStateMachine.AddState("Crouching", onEnter: state => Debug.Log("Crouching"), isGhostState: true);
         _crouchingStateMachine.AddState("Crouch", _crouchState);
         _crouchingStateMachine.AddState("IdleCrouch", _idleCrouchState);
-
         
-        _jumpingStateMachine.AddState("Jumping", onEnter: state => Debug.Log("Jumping"), isGhostState: true);
-        _jumpingStateMachine.AddState("Jump", _jumpState);
-        _jumpingStateMachine.AddState("Fall", _fallState);
+        _airborneStateMachine.AddState("Airborne", onEnter: state => Debug.Log("Airborne"), isGhostState: true);
+        _airborneStateMachine.AddState("Jump", _jumpState);
+        _airborneStateMachine.AddState("Fall", _fallState);
         
         
-        _groundedStateMachine.AddTwoWayTransition("Grounded", "Standing", t => Input.GetAxisRaw("Vertical") == 0);
+        // Grounded to Crouching
         _groundedStateMachine.AddTwoWayTransition("Grounded", "Crouching", t => Input.GetAxisRaw("Vertical") != 0);
         
         _crouchingStateMachine.AddTransition("Crouching", "Crouch", t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") != 0);
@@ -72,41 +68,42 @@ public class PlayerController : MonoBehaviour
 
         _crouchingStateMachine.AddTransition("IdleCrouch", "Crouch", t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") != 0);
         _crouchingStateMachine.AddTransition("Crouch", "IdleCrouch",    t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") == 0);
-            
+        
+        
+        // Grounded to Standing
+        _groundedStateMachine.AddTwoWayTransition("Grounded", "Standing", t => Input.GetAxisRaw("Vertical") == 0);
+
         _standingStateMachine.AddTransition("Standing", "Idle", t => Input.GetAxisRaw("Horizontal") == 0);
         _standingStateMachine.AddTransition("Standing", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
         
+        // _standingStateMachine.AddTwoWayTransition("Idle", "Walk" t => Input.GetAxisRaw("Horizontal") != 0);
         _standingStateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
         _standingStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
         
-        // _standingStateMachine.AddTwoWayTransition("Idle", "Walk" t => Input.GetAxisRaw("Horizontal") != 0);
 
-
-        _stateMachine.AddTransition("Grounded", "Jumping",    t => Input.GetKeyDown("space") || !_boxCollider.IsTouchingLayers(layerMask));
+        // Grounded to Airborne
+        _stateMachine.AddTransition("Grounded", "Airborne",    t => Input.GetKeyDown("space") || !_boxCollider.IsTouchingLayers(layerMask));
         
-        _jumpingStateMachine.AddExitTransition("Fall", t => _boxCollider.IsTouchingLayers(layerMask));
-        
-        _jumpingStateMachine.AddTransition("Jumping", "Jump",    t => Input.GetKey("space"));
-        _jumpingStateMachine.AddTransition("Jumping", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
+        _airborneStateMachine.AddTransition("Airborne", "Jump",    t => Input.GetKeyDown("space"));
+        _airborneStateMachine.AddTransition("Airborne", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
 
-        _jumpingStateMachine.AddTransition("Jump", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
+        _airborneStateMachine.AddTransition("Jump", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
+        // _airborneStateMachine.AddTransition("Fall", "Jump",    t => Input.GetKeyDown("space"));
 
-        // _stateMachine.AddTransition(new TransitionAfter("Fall", "Grounded", 0.5f));
-        _stateMachine.AddTransition("Jumping", "Grounded", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
-        
-        _stateMachine.AddTransition("Jumping", "Dash", t => Input.GetKeyDown("o"));
+        // Airborne to Grounded
+        _stateMachine.AddTransition("Airborne", "Grounded", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
+         
+        // To DASH
+        _stateMachine.AddTransition("Airborne", "Dash", t => Input.GetKeyDown("o"));
         _stateMachine.AddTransition("Grounded", "Dash", t => Input.GetKeyDown("o") && _groundedStateMachine.ActiveState != _crouchingStateMachine);
         
-        // _stateMachine.AddTransitionFromAny("Dash", t => Input.GetKeyDown("o") && _groundedStateMachine.ActiveState != _crouchingStateMachine);
-        // _stateMachine.AddTransitionFromAny("Dash", t => Input.GetKeyDown("o"));
-
-
-        _stateMachine.AddTransition("Dash", "Jumping", t => !_boxCollider.IsTouchingLayers(layerMask));
+        // Form Dash
+        _stateMachine.AddTransition("Dash", "Airborne", t => !_boxCollider.IsTouchingLayers(layerMask));
         _stateMachine.AddTransition("Dash", "Grounded", t => _boxCollider.IsTouchingLayers(layerMask));
 
         
         _groundedStateMachine.SetStartState("Grounded");
-        _jumpingStateMachine.SetStartState("Jumping");
+        _airborneStateMachine.SetStartState("Airborne");
         _crouchingStateMachine.SetStartState("Crouching");
         _standingStateMachine.SetStartState("Standing");
         _stateMachine.SetStartState("Grounded");
@@ -117,7 +114,23 @@ public class PlayerController : MonoBehaviour
     private void Update()
     {
         _stateMachine.OnLogic();
-
-        // Debug.Log(_stateMachine.ActiveStateName.);
     }
+
+    private void FixedUpdate()
+    {
+        // _stateMachine.OnFixedUpdate();
+        
+        _stateMachine.OnAction("OnFixedLogic");
+    }
+}
+
+public class ActionStateWithFixed : ActionState
+{
+    protected ActionStateWithFixed(bool needsExitTime, bool isGhostState = false)
+        : base(needsExitTime, isGhostState)
+    {
+        AddAction("OnFixedLogic", OnFixedLogic);
+    }
+
+    public virtual void OnFixedLogic() { }
 }

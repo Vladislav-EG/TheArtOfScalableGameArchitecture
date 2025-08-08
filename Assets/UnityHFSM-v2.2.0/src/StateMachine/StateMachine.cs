@@ -453,7 +453,21 @@ namespace UnityHFSM
 			runOnLogic:
 			activeState?.OnLogic();
 		}
-
+		
+		// public override void OnFixedUpdate()
+		// {
+		// 	EnsureIsInitializedFor("Running OnLogic"); // FIXME
+		// 	
+		// 	if (TryAllGlobalTransitions())
+		// 		goto runOnFixedUpdate;
+		// 	
+		// 	if (TryAllDirectTransitions())
+		// 		goto runOnFixedUpdate;
+		// 	
+		// 	runOnFixedUpdate:
+		// 	activeState?.OnFixedUpdate();
+		// }
+		
 		public override void OnExit()
 		{
 			if (activeState == null)

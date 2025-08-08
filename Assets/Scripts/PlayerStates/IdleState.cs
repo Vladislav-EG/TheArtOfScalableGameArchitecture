@@ -127,6 +127,26 @@ namespace PlayerStates
             DebugColorLog.LogExit<FallState>();
         }
     }
+    
+    public class CrouchState : StateBase<string>
+    {
+        public CrouchState() : base(needsExitTime: false) { }
+
+        public override void OnEnter()
+        {
+            DebugColorLog.LogEnter<CrouchState>();
+        }
+
+        public override void OnLogic()
+        {
+            // Fall logic
+        }
+
+        public override void OnExit()
+        {
+            DebugColorLog.LogExit<CrouchState>();
+        }
+    }
 }
 
 

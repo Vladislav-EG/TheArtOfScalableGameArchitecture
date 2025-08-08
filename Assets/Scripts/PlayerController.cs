@@ -12,12 +12,17 @@ public class PlayerController : MonoBehaviour
     private StateMachine _stateMachine;
     private StateMachine _groundedStateMachine;
     private StateMachine _jumpingStateMachine;
+    private StateMachine _crouchingStateMachine;
+    private StateMachine _standingStateMachine;
     
     private IdleState _idleState;
     private WalkState _walkState;
     private JumpState _jumpState;
     private FallState _fallState;
     private DashState _dashState;
+    private CrouchState _crouchState;
+
+
 
     private void Awake()
     {
@@ -26,31 +31,53 @@ public class PlayerController : MonoBehaviour
         _jumpState = new JumpState(_rigidbody, transform);
         _fallState = new FallState();
         _dashState = new DashState(_rigidbody, transform);
+        _crouchState = new CrouchState();
 
         _stateMachine = new StateMachine(); 
         _groundedStateMachine = new StateMachine();
         _jumpingStateMachine = new StateMachine();
-        
-        _groundedStateMachine.AddState("Grounded", onEnter: state => Debug.Log("Grounded"));
-        _groundedStateMachine.AddState("Idle", _idleState);
-        _groundedStateMachine.AddState("Walk", _walkState);
-
-        _jumpingStateMachine.AddState("Jumping", onEnter: state => Debug.Log("Jumping"));
-        _jumpingStateMachine.AddState("Jump", _jumpState);
-        _jumpingStateMachine.AddState("Fall", _fallState);
+        _standingStateMachine = new StateMachine();
+        _crouchingStateMachine = new StateMachine();
         
         _stateMachine.AddState("Grounded", _groundedStateMachine);
         _stateMachine.AddState("Jumping", _jumpingStateMachine);
         _stateMachine.AddState("Dash", _dashState);
+        
+        _groundedStateMachine.AddState("Grounded", onEnter: state => Debug.Log("Grounded"));
+        _groundedStateMachine.AddState("Standing", _standingStateMachine);
+        _groundedStateMachine.AddState("Crouching", _crouchingStateMachine);
 
-
-        _groundedStateMachine.AddTransition("Grounded", "Idle", t => Input.GetAxisRaw("Horizontal") == 0);
-        _groundedStateMachine.AddTransition("Grounded", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
-
+        // _groundedStateMachine.AddState("Crouching", _walkState);
         // _groundedStateMachine.AddTwoWayTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
+        
+        _standingStateMachine.AddState("Standing", onEnter: state => Debug.Log("Standing"));
+        _standingStateMachine.AddState("Idle", _idleState);
+        _standingStateMachine.AddState("Walk", _walkState);
+        
+        _crouchingStateMachine.AddState("Crouching", onEnter: state => Debug.Log("Crouching"));
+        _crouchingStateMachine.AddState("Crouch", _crouchState);
+        
+        _jumpingStateMachine.AddState("Jumping", onEnter: state => Debug.Log("Jumping"));
+        _jumpingStateMachine.AddState("Jump", _jumpState);
+        _jumpingStateMachine.AddState("Fall", _fallState);
+        
 
-        _groundedStateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
-        _groundedStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
+        // _groundedStateMachine.AddTransition("Grounded", "Standing", t => Input.GetAxisRaw("Vertical") == 0);
+        // _groundedStateMachine.AddTransition("Standing", "Grounded", t => Input.GetAxisRaw("Vertical") != 0);
+        //
+        // _groundedStateMachine.AddTransition("Grounded", "Crouching", t => Input.GetAxisRaw("Vertical") != 0);
+        // _groundedStateMachine.AddTransition("Crouching", "Grounded", t => Input.GetAxisRaw("Vertical") == 0);
+
+        _groundedStateMachine.AddTwoWayTransition("Grounded", "Standing", t => Input.GetAxisRaw("Vertical") == 0);
+        _groundedStateMachine.AddTwoWayTransition("Grounded", "Crouching", t => Input.GetAxisRaw("Vertical") != 0);
+        
+        _crouchingStateMachine.AddTransition("Crouching", "Crouch", t => Input.GetAxisRaw("Vertical") != 0);
+            
+        _standingStateMachine.AddTransition("Standing", "Idle", t => Input.GetAxisRaw("Horizontal") == 0);
+        _standingStateMachine.AddTransition("Standing", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
+
+        _standingStateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
+        _standingStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
 
         _stateMachine.AddTransition("Grounded", "Jumping",    t => Input.GetKeyDown("space"));
         
@@ -73,6 +100,10 @@ public class PlayerController : MonoBehaviour
 
         _groundedStateMachine.SetStartState("Grounded");
         _jumpingStateMachine.SetStartState("Jumping");
+        _crouchingStateMachine.SetStartState("Crouching");
+        _standingStateMachine.SetStartState("Standing");
+
+
 
         _stateMachine.SetStartState("Grounded");
         _stateMachine.Init();

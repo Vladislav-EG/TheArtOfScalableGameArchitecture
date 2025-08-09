@@ -2,12 +2,16 @@ using System;
 using PlayerStates;
 using UnityEngine;
 using UnityHFSM;
+using UnityHFSM.Visualization;  // Import the animator graph feature.
+
 
 public class PlayerController : MonoBehaviour
 {
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private BoxCollider2D _boxCollider;
     [SerializeField] private LayerMask layerMask;
+    [SerializeField] private Animator _fsmAnimator;
+
 
     private StateMachine _stateMachine;
     private StateMachine _groundedStateMachine;
@@ -39,7 +43,7 @@ public class PlayerController : MonoBehaviour
         _standingStateMachine = new StateMachine();
         _crouchingStateMachine = new StateMachine();
         
-        _stateMachine.AddState("Grounded", _groundedStateMachine);
+        _stateMachine.AddState("GroundedRoot", _groundedStateMachine);
         _stateMachine.AddState("Airborne", _airborneStateMachine);
         _stateMachine.AddState("Dash", _dashState);
         
@@ -58,7 +62,6 @@ public class PlayerController : MonoBehaviour
         _airborneStateMachine.AddState("Airborne", onEnter: state => Debug.Log("Airborne"), isGhostState: true);
         _airborneStateMachine.AddState("Jump", _jumpState);
         _airborneStateMachine.AddState("Fall", _fallState);
-        
         
         // Grounded to Crouching
         _groundedStateMachine.AddTwoWayTransition("Grounded", "Crouching", t => Input.GetAxisRaw("Vertical") != 0);
@@ -80,9 +83,8 @@ public class PlayerController : MonoBehaviour
         _standingStateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
         _standingStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
         
-
         // Grounded to Airborne
-        _stateMachine.AddTransition("Grounded", "Airborne",    t => Input.GetKeyDown("space") || !_boxCollider.IsTouchingLayers(layerMask));
+        _stateMachine.AddTransition("GroundedRoot", "Airborne",    t => Input.GetKeyDown("space") || !_boxCollider.IsTouchingLayers(layerMask));
         
         _airborneStateMachine.AddTransition("Airborne", "Jump",    t => Input.GetKeyDown("space"));
         _airborneStateMachine.AddTransition("Airborne", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
@@ -91,29 +93,41 @@ public class PlayerController : MonoBehaviour
         // _airborneStateMachine.AddTransition("Fall", "Jump",    t => Input.GetKeyDown("space"));
 
         // Airborne to Grounded
-        _stateMachine.AddTransition("Airborne", "Grounded", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
+        _stateMachine.AddTransition("Airborne", "GroundedRoot", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
          
         // To DASH
         _stateMachine.AddTransition("Airborne", "Dash", t => Input.GetKeyDown("o"));
-        _stateMachine.AddTransition("Grounded", "Dash", t => Input.GetKeyDown("o") && _groundedStateMachine.ActiveState != _crouchingStateMachine);
+        _stateMachine.AddTransition("GroundedRoot", "Dash", t => Input.GetKeyDown("o") && _groundedStateMachine.ActiveState != _crouchingStateMachine);
         
         // Form Dash
         _stateMachine.AddTransition("Dash", "Airborne", t => !_boxCollider.IsTouchingLayers(layerMask));
-        _stateMachine.AddTransition("Dash", "Grounded", t => _boxCollider.IsTouchingLayers(layerMask));
+        _stateMachine.AddTransition("Dash", "GroundedRoot", t => _boxCollider.IsTouchingLayers(layerMask));
 
         
         _groundedStateMachine.SetStartState("Grounded");
         _airborneStateMachine.SetStartState("Airborne");
         _crouchingStateMachine.SetStartState("Crouching");
         _standingStateMachine.SetStartState("Standing");
-        _stateMachine.SetStartState("Grounded");
+        _stateMachine.SetStartState("GroundedRoot");
         
         _stateMachine.Init();
+        
+#if UNITY_EDITOR
+        HfsmAnimatorGraph.CreateAnimatorFromStateMachine(
+            _stateMachine,
+            outputFolderPath: "Assets/DebugAnimators",
+            animatorName: "StateMachineAnimatorGraph.controller"
+        );
+#endif
     }
 
     private void Update()
     {
         _stateMachine.OnLogic();
+        
+#if UNITY_EDITOR
+        HfsmAnimatorGraph.PreviewStateMachineInAnimator(_stateMachine, _fsmAnimator);
+#endif
     }
 
     private void FixedUpdate()

@@ -16,12 +16,12 @@ namespace PlayerStates
         public override void OnLogic()
         {
             // Idle logic
-            UnityEngine.Debug.Log("Update");
+            // UnityEngine.Debug.Log("Update");
         }
         
         public override void OnFixedLogic()
         {
-            UnityEngine.Debug.Log("FixedUpdate");
+            // UnityEngine.Debug.Log("FixedUpdate");
         }
         
         public override void OnExit()

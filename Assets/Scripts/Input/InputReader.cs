@@ -62,6 +62,8 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
     // public Vector2 GetMoveDirection() => _moveHandler != null ? _moveHandler.Value : Vector2.zero;
     
     public Vector2 GetMoveDirection() => _moveHandler.Value;
+    public float GetVerticalDirection() => _moveHandler.Value.y;
+    public float GetHorizontalDirection() => _moveHandler.Value.x;
     public InputButtonState GetJumpState() => _jumpHandler.State;
     public InputButtonState GetCrouchState() => _crouchHandler.State;
     public InputButtonState GetDashState() => _dashHandler.State;

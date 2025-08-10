@@ -7,11 +7,16 @@ using UnityHFSM.Visualization;  // Import the animator graph feature.
 
 public class PlayerController : MonoBehaviour
 {
+    // TODO _inputReader.GetHorizontalDirection() != 0 в InputReader добавить отдельные методы по типу: 
+    // public bool IsMovingHorizontally() => Mathf.Abs(GetHorizontalDirection()) > Mathf.Epsilon; 
+    // public bool IsStandingStill() => Mathf.Abs(GetHorizontalDirection()) <= Mathf.Epsilon;
+
+    
     [SerializeField] private Rigidbody2D _rigidbody;
     [SerializeField] private BoxCollider2D _boxCollider;
     [SerializeField] private LayerMask layerMask;
     [SerializeField] private Animator _fsmAnimator;
-
+    [SerializeField] private InputReader _inputReader;
 
     private StateMachine _stateMachine;
     private StateMachine _groundedStateMachine;
@@ -63,30 +68,31 @@ public class PlayerController : MonoBehaviour
         _airborneStateMachine.AddState("Jump", _jumpState);
         _airborneStateMachine.AddState("Fall", _fallState);
         
-        // Grounded to Crouching
-        _groundedStateMachine.AddTwoWayTransition("Grounded", "Crouching", t => Input.GetAxisRaw("Vertical") != 0);
-        
-        _crouchingStateMachine.AddTransition("Crouching", "Crouch", t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") != 0);
-        _crouchingStateMachine.AddTransition("Crouching", "IdleCrouch", t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") == 0);
 
-        _crouchingStateMachine.AddTransition("IdleCrouch", "Crouch", t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") != 0);
-        _crouchingStateMachine.AddTransition("Crouch", "IdleCrouch",    t => Input.GetAxisRaw("Vertical") != 0 && Input.GetAxisRaw("Horizontal") == 0);
+        // Grounded to Crouching
+        _groundedStateMachine.AddTwoWayTransition("Grounded", "Crouching", t => _inputReader.GetCrouchState().IsHeld);
+        
+        _crouchingStateMachine.AddTransition("Crouching", "Crouch", t => _inputReader.GetHorizontalDirection() != 0);
+        _crouchingStateMachine.AddTransition("Crouching", "IdleCrouch", t => _inputReader.GetHorizontalDirection() == 0);
+
+        _crouchingStateMachine.AddTransition("IdleCrouch", "Crouch", t => _inputReader.GetHorizontalDirection() != 0);
+        _crouchingStateMachine.AddTransition("Crouch", "IdleCrouch",    t => _inputReader.GetHorizontalDirection() == 0);
         
         
         // Grounded to Standing
-        _groundedStateMachine.AddTwoWayTransition("Grounded", "Standing", t => Input.GetAxisRaw("Vertical") == 0);
+        _groundedStateMachine.AddTwoWayTransition("Grounded", "Standing", t => !_inputReader.GetCrouchState().IsHeld); // В общем переход сразу если никакие другие не проходят
 
-        _standingStateMachine.AddTransition("Standing", "Idle", t => Input.GetAxisRaw("Horizontal") == 0);
-        _standingStateMachine.AddTransition("Standing", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
+        _standingStateMachine.AddTransition("Standing", "Idle", t => _inputReader.GetHorizontalDirection() == 0);
+        _standingStateMachine.AddTransition("Standing", "Walk", t => _inputReader.GetHorizontalDirection() != 0);
         
         // _standingStateMachine.AddTwoWayTransition("Idle", "Walk" t => Input.GetAxisRaw("Horizontal") != 0);
-        _standingStateMachine.AddTransition("Idle", "Walk", t => Input.GetAxisRaw("Horizontal") != 0);
-        _standingStateMachine.AddTransition("Walk", "Idle",    t => Input.GetAxisRaw("Horizontal") == 0);
+        _standingStateMachine.AddTransition("Idle", "Walk", t => _inputReader.GetHorizontalDirection() != 0);
+        _standingStateMachine.AddTransition("Walk", "Idle",    t => _inputReader.GetHorizontalDirection() == 0);
         
         // Grounded to Airborne
-        _stateMachine.AddTransition("GroundedRoot", "Airborne",    t => Input.GetKeyDown("space") || !_boxCollider.IsTouchingLayers(layerMask));
+        _stateMachine.AddTransition("GroundedRoot", "Airborne",    t => _inputReader.GetJumpState().WasPressedThisFrame || !_boxCollider.IsTouchingLayers(layerMask));
         
-        _airborneStateMachine.AddTransition("Airborne", "Jump",    t => Input.GetKeyDown("space"));
+        _airborneStateMachine.AddTransition("Airborne", "Jump",    t => _inputReader.GetJumpState().WasPressedThisFrame);
         _airborneStateMachine.AddTransition("Airborne", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
 
         _airborneStateMachine.AddTransition("Jump", "Fall",    t => _rigidbody.linearVelocity.y < 0f);
@@ -96,8 +102,8 @@ public class PlayerController : MonoBehaviour
         _stateMachine.AddTransition("Airborne", "GroundedRoot", t => _rigidbody.linearVelocity.y <= 0f && _boxCollider.IsTouchingLayers(layerMask));
          
         // To DASH
-        _stateMachine.AddTransition("Airborne", "Dash", t => Input.GetKeyDown("o"));
-        _stateMachine.AddTransition("GroundedRoot", "Dash", t => Input.GetKeyDown("o") && _groundedStateMachine.ActiveState != _crouchingStateMachine);
+        _stateMachine.AddTransition("Airborne", "Dash", t => _inputReader.GetDashState().WasPressedThisFrame);
+        _stateMachine.AddTransition("GroundedRoot", "Dash", t => _inputReader.GetDashState().WasPressedThisFrame && _groundedStateMachine.ActiveState != _crouchingStateMachine);
         
         // Form Dash
         _stateMachine.AddTransition("Dash", "Airborne", t => !_boxCollider.IsTouchingLayers(layerMask));
@@ -112,7 +118,7 @@ public class PlayerController : MonoBehaviour
         
         _stateMachine.Init();
         
-#if UNITY_EDITOR
+#if UNITY_EDITOR // TODO Вынести в статический класс
         HfsmAnimatorGraph.CreateAnimatorFromStateMachine(
             _stateMachine,
             outputFolderPath: "Assets/DebugAnimators",
@@ -125,7 +131,7 @@ public class PlayerController : MonoBehaviour
     {
         _stateMachine.OnLogic();
         
-#if UNITY_EDITOR
+#if UNITY_EDITOR // TODO Вынести в статический класс
         HfsmAnimatorGraph.PreviewStateMachineInAnimator(_stateMachine, _fsmAnimator);
 #endif
     }
@@ -135,6 +141,11 @@ public class PlayerController : MonoBehaviour
         // _stateMachine.OnFixedUpdate();
         
         _stateMachine.OnAction("OnFixedLogic");
+    }
+
+    private void LateUpdate()
+    {
+        _inputReader.ResetFrameStates();
     }
 }
 

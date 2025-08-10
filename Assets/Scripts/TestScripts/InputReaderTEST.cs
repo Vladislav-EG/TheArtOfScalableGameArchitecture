@@ -51,9 +51,9 @@ public class InputReaderTEST : MonoBehaviour, IPlayerActions
         // Debug.Log(JumpKeyWasReleased);
         // Debug.Log(JumpKeyPressed);
 
-        Debug.Log(_testClass.KeyWasPressed);
-        Debug.Log(_testClass.KeyWasReleased);
-        Debug.Log(_testClass.KeyIsPressed);
+        // Debug.Log(_testClass.KeyWasPressed);
+        // Debug.Log(_testClass.KeyWasReleased);
+        // Debug.Log(_testClass.KeyIsPressed);
     }
 
     public void OnEnablePlayerActions()
@@ -87,6 +87,11 @@ public class InputReaderTEST : MonoBehaviour, IPlayerActions
     }
 
     public void OnDash(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
     {
         throw new System.NotImplementedException();
     }

@@ -2,14 +2,20 @@ using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
+public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, PlayerInputActions.IUIActions
 {
-    private PlayerInputActions _inputActions;
+    // TODO 2 интерфейса один для кнопок с UI другой для кнопок с Gameplay
+    // TODO InputReader занимается двумя обязанностями он дает считывать нажатие клавиш и включает отличает карты
+    
+    
+    public PlayerInputActions InputActions;
 
     private readonly VectorInputHandler _moveHandler = new VectorInputHandler();
     private readonly ButtonInputHandler _dashHandler = new ButtonInputHandler();
     private readonly ButtonInputHandler _jumpHandler = new ButtonInputHandler();
     private readonly ButtonInputHandler _crouchHandler = new ButtonInputHandler();
+    
+    private readonly ButtonInputHandler _pauseHandler = new ButtonInputHandler();
 
     public event Action<Vector2> OnMoveChanged;
     public event Action<InputButtonState> OnDashChanged;
@@ -18,17 +24,39 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
     
     private void OnEnable()
     {
-        if (_inputActions == null)
+        if (InputActions == null)
         {
-            _inputActions = new PlayerInputActions();
-            _inputActions.Player.SetCallbacks(this);
+            InputActions = new PlayerInputActions();
+            InputActions.Player.SetCallbacks(this);
+            InputActions.UI.SetCallbacks(this);
         }
-        _inputActions.Enable();
+        InputActions.Enable();
+        InputActions.UI.Enable();
     }
 
     private void OnDisable()
     {
-        _inputActions.Disable();
+        InputActions.Disable();
+        InputActions.UI.Disable();
+    }
+    
+    public void EnableGameplay() // TODO Создать интерфейс
+    {
+        InputActions.UI.Disable();
+        InputActions.Player.Enable();
+    }
+
+    public void EnableUI()
+    {
+        InputActions.Player.Disable();
+        InputActions.UI.Enable();
+    } 
+    
+    public void EnableAll()
+    {
+        // если нужно чтобы и UI и Player работали одновременно
+        InputActions.Player.Enable();
+        InputActions.UI.Enable();
     }
 
     public void OnMove(InputAction.CallbackContext context)
@@ -41,6 +69,12 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
     {
         _dashHandler.Update(context);
         OnDashChanged?.Invoke(_dashHandler.State);
+    }
+
+    public void OnPause(InputAction.CallbackContext context)
+    {
+        _pauseHandler.Update(context);
+
     }
 
     public void OnJump(InputAction.CallbackContext context)
@@ -63,16 +97,21 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
     
     public Vector2 GetMoveDirection() => _moveHandler.Value;
     public float GetVerticalDirection() => _moveHandler.Value.y;
+    
     public float GetHorizontalDirection() => _moveHandler.Value.x;
     public InputButtonState GetJumpState() => _jumpHandler.State;
     public InputButtonState GetCrouchState() => _crouchHandler.State;
     public InputButtonState GetDashState() => _dashHandler.State;
+    
+    public InputButtonState GetPauseState() => _pauseHandler.State;
+
     
     public void ResetFrameStates()
     {
         _dashHandler.State.ResetFrameState();
         _jumpHandler.State.ResetFrameState();
         _crouchHandler.State.ResetFrameState();
+        _pauseHandler.State.ResetFrameState();
     }
     
     // public float GetRawHorizontalDirection() 
@@ -92,6 +131,22 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions
     //     float normalizedX = Mathf.Approximately(x, 0f) ? 0f : Mathf.Sign(x);
     //     return new Vector2(normalizedX, 0f);
     // }
+    
+    // UI
+    public void OnNavigate(InputAction.CallbackContext context)
+    {
+        Debug.Log("Navigate");
+    }
 
+    public void OnSubmit(InputAction.CallbackContext context)
+    {
+        Debug.Log("OnSubmit");
+    }
+
+    public void OnCancel(InputAction.CallbackContext context)
+    {
+        _pauseHandler.Update(context);
+        Debug.Log("OnCancel");
+    }
 }
 

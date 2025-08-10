@@ -1,8 +1,7 @@
-using System;
 using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using static InputSystem_Actions;
+using static PlayerInputActions;
 
 public class TestClass
 {
@@ -18,9 +17,9 @@ public class TestClass
     public bool KeyIsPressed => _playerActions.IsPressed();
 }
 
-public class InputReader : MonoBehaviour, IPlayerActions
+public class InputReaderTEST : MonoBehaviour, IPlayerActions
 {
-    public InputSystem_Actions inputSystemActions;
+    public PlayerInputActions playerInputActions;
     public JumpInputState jumpInputState;
     
     private TestClass _testClass;
@@ -31,12 +30,12 @@ public class InputReader : MonoBehaviour, IPlayerActions
         
         jumpInputState = new JumpInputState();
 
-        _testClass = new TestClass(inputSystemActions.Player.Jump);
+        _testClass = new TestClass(playerInputActions.Player.Jump);
     }
     
-    public bool JumpKeyWasPressed => inputSystemActions.Player.Jump.WasPressedThisFrame();
-    public bool JumpKeyWasReleased => inputSystemActions.Player.Jump.WasReleasedThisFrame();
-    public bool JumpKeyPressed => inputSystemActions.Player.Jump.IsPressed();
+    public bool JumpKeyWasPressed => playerInputActions.Player.Jump.WasPressedThisFrame();
+    public bool JumpKeyWasReleased => playerInputActions.Player.Jump.WasReleasedThisFrame();
+    public bool JumpKeyPressed => playerInputActions.Player.Jump.IsPressed();
 
     public bool test1;
     public bool test2;
@@ -59,12 +58,12 @@ public class InputReader : MonoBehaviour, IPlayerActions
 
     public void OnEnablePlayerActions()
     {
-        if (inputSystemActions == null)
+        if (playerInputActions == null)
         {
-            inputSystemActions = new InputSystem_Actions();
-            inputSystemActions.Player.SetCallbacks(this);
+            playerInputActions = new PlayerInputActions();
+            playerInputActions.Player.SetCallbacks(this);
         }
-        inputSystemActions.Enable();
+        playerInputActions.Enable();
     }
     
     public void OnMove(InputAction.CallbackContext context)
@@ -85,6 +84,11 @@ public class InputReader : MonoBehaviour, IPlayerActions
         // Debug.Log(test1);
         // Debug.Log(test2);
         // Debug.Log(test3);
+    }
+
+    public void OnDash(InputAction.CallbackContext context)
+    {
+        throw new System.NotImplementedException();
     }
 
     public void OnLook(InputAction.CallbackContext context)
@@ -137,3 +141,5 @@ public class JumpInputState
         WasReleasedThisFrame = jumpAction.WasReleasedThisFrame();
     }
 }
+
+

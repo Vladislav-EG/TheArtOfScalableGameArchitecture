@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -6,7 +7,6 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
 {
     // TODO 2 интерфейса один для кнопок с UI другой для кнопок с Gameplay
     // TODO InputReader занимается двумя обязанностями он дает считывать нажатие клавиш и включает отличает карты
-    
     
     public PlayerInputActions InputActions;
 
@@ -22,6 +22,21 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
     public event Action<InputButtonState> OnJumpChanged;
     public event Action<InputButtonState> OnCrouchChanged;
     
+    private enum MyEnum
+    {
+        Dash,
+        Jump
+    }
+    
+    private readonly Dictionary<MyEnum, ButtonInputHandler> _buttonHandlers = new();
+    private readonly Dictionary<string, VectorInputHandler> _inputHandlers = new(); // inputService.Player.GetDashState.IsPressed
+
+    private void Awake()
+    {
+        _buttonHandlers[MyEnum.Dash] = _dashHandler;
+        _buttonHandlers[MyEnum.Jump] = _jumpHandler;
+    }
+
     private void OnEnable()
     {
         if (InputActions == null)
@@ -104,6 +119,11 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
     public InputButtonState GetDashState() => _dashHandler.State;
     
     public InputButtonState GetPauseState() => _pauseHandler.State;
+    
+    
+    // public InputAction GetTest() => InputActions.Player.Jump;
+    // public InputAction GetTest2() => InputActions.Player.Move;
+
 
     
     public void ResetFrameStates()
@@ -147,6 +167,6 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
     {
         _pauseHandler.Update(context);
         Debug.Log("OnCancel");
-    }
+    }  
 }
 

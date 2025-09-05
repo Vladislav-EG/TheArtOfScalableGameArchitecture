@@ -688,7 +688,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 0
   _fsmAnimator: {fileID: 0}
-  _inputReader: {fileID: 0}
+  _inputService: {fileID: 0}
 --- !u!4 &1245987953
 Transform:
   m_ObjectHideFlags: 0
@@ -699,6 +699,50 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.49148566, y: 2.6647506, z: -0.9900093}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1340050533
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1340050535}
+  - component: {fileID: 1340050534}
+  m_Layer: 0
+  m_Name: InputService
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1340050534
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340050533}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3e4677a603abe43ec8dc5ebec1859118, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+--- !u!4 &1340050535
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1340050533}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 1.8830918, y: 3.4029503, z: -0.07615033}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -736,7 +780,7 @@ MonoBehaviour:
   pausePanel: {fileID: 0}
   continueButton: {fileID: 0}
   exitButton: {fileID: 0}
-  _inputReader: {fileID: 1600605204}
+  _inputService: {fileID: 1340050534}
 --- !u!4 &1445761654
 Transform:
   m_ObjectHideFlags: 0
@@ -899,7 +943,6 @@ GameObject:
   - component: {fileID: 1600605202}
   - component: {fileID: 1600605201}
   - component: {fileID: 1600605203}
-  - component: {fileID: 1600605204}
   m_Layer: 0
   m_Name: Player
   m_TagString: Untagged
@@ -1069,19 +1112,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _fsmAnimator: {fileID: 1035950604}
-  _inputReader: {fileID: 1600605204}
---- !u!114 &1600605204
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1600605196}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 2072558f94464dcdbeb00d77676951c8, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
+  _inputService: {fileID: 1340050534}
 --- !u!1 &1963970332
 GameObject:
   m_ObjectHideFlags: 0
@@ -1111,7 +1142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d72f90cbdd7c713468c8b9ce196f1751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputReader: {fileID: 1600605204}
+  _inputService: {fileID: 1340050534}
 --- !u!4 &1963970334
 Transform:
   m_ObjectHideFlags: 0
@@ -1141,3 +1172,4 @@ SceneRoots:
   - {fileID: 92631743}
   - {fileID: 1963970334}
   - {fileID: 1445761654}
+  - {fileID: 1340050535}

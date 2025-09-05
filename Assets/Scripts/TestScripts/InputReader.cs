@@ -120,9 +120,9 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
 	public InputButtonState GetDashState() => _dashHandler.State;
 
 	public InputButtonState GetPauseState() => _pauseHandler.State;
-	
+
 	public InputButtonState GetCancelState() => _cancelHandler.State;
-	
+
 
 
 	// public InputAction GetTest() => InputActions.Player.Jump;
@@ -136,9 +136,9 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
 		_jumpHandler.State.ResetFrameState();
 		_crouchHandler.State.ResetFrameState();
 		_pauseHandler.State.ResetFrameState();
-		
+
 		_cancelHandler.State.ResetFrameState();
-		
+
 	}
 
 	// public float GetRawHorizontalDirection() 
@@ -174,8 +174,10 @@ public class InputReader : MonoBehaviour, PlayerInputActions.IPlayerActions, Pla
 	{
 		_pauseHandler.Update(context);
 		_cancelHandler.Update(context);
-		
+
 		Debug.Log("OnCancel");
 	}
 }
+
+
 

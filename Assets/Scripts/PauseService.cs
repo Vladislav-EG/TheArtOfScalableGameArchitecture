@@ -13,7 +13,9 @@ public class PauseService : MonoBehaviour
 	[SerializeField] private Button continueButton; // Кнопка "Продолжить"
 	[SerializeField] private Button exitButton; // Кнопка "Выйти"
 
-	[SerializeField] private InputReader _inputReader;
+	// [SerializeField] private InputReader _inputReader;
+	[SerializeField] private InputService _inputService;
+	
 
 	private bool isPaused = false;
 
@@ -55,7 +57,7 @@ public class PauseService : MonoBehaviour
 	{
 		if (!isPaused)
 		{
-			_inputReader.EnableUI();
+			_inputService.EnableUI();
 
 			isPaused = true;
 			Time.timeScale = 0f; // Остановить время в игре
@@ -73,7 +75,7 @@ public class PauseService : MonoBehaviour
 	{
 		if (isPaused)
 		{
-			_inputReader.EnableGameplay();
+			_inputService.EnableGameplay();
 
 			isPaused = false;
 			Time.timeScale = 1f; // Возобновить время

@@ -38,7 +38,9 @@ public class GameStateMachine : MonoBehaviour
 	private GameplayState _gameplayState;
 	private PauseState _pauseState;
 	
-	[SerializeField] private InputReader _inputReader;
+	// [SerializeField] private InputReader _inputReader;
+	[SerializeField] private InputService _inputService;
+	
 
 	private void Awake()
 	{
@@ -71,9 +73,9 @@ public class GameStateMachine : MonoBehaviour
 	private void ConfigureTransitions()
 	{
 		// _gameStateMachine.AddTransition("Gameplay", "Pause", t => Input.GetKeyDown("escape"));
-		_gameStateMachine.AddTransition("Gameplay", "Pause", t => _inputReader.GetPauseState().WasPressedThisFrame);
+		_gameStateMachine.AddTransition("Gameplay", "Pause", t => _inputService.Player.GetPauseState().WasPressedThisFrame);
 		
-		_gameStateMachine.AddTransition("Pause", "Gameplay", t => _inputReader.GetCancelState().WasPressedThisFrame);
+		_gameStateMachine.AddTransition("Pause", "Gameplay", t => _inputService.UI.GetPauseState().WasPressedThisFrame);
 
 		_gameStateMachine.SetStartState("Gameplay");
 	}

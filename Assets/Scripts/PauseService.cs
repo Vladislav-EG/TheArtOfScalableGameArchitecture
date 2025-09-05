@@ -5,96 +5,96 @@ using UnityEngine.SceneManagement; // Если нужно для выхода, �
 
 public class PauseService : MonoBehaviour
 {
-    // Singleton instance
-    public static PauseService Instance { get; private set; }
+	// Singleton instance
+	public static PauseService Instance { get; private set; }
 
-    // UI элементы: предполагаем, что у вас есть Canvas с Panel для паузы
-    [SerializeField] private GameObject pausePanel; // Прикрепите ваш Pause Panel в инспекторе
-    [SerializeField] private Button continueButton; // Кнопка "Продолжить"
-    [SerializeField] private Button exitButton; // Кнопка "Выйти"
-    
-    [SerializeField] private InputReader _inputReader;
-    
-    private bool isPaused = false;
+	// UI элементы: предполагаем, что у вас есть Canvas с Panel для паузы
+	[SerializeField] private GameObject pausePanel; // Прикрепите ваш Pause Panel в инспекторе
+	[SerializeField] private Button continueButton; // Кнопка "Продолжить"
+	[SerializeField] private Button exitButton; // Кнопка "Выйти"
 
-    private void Awake()
-    {
-        // Реализация singleton: убедимся, что только один экземпляр
-        if (Instance == null)
-        {
-            Instance = this;
-            DontDestroyOnLoad(gameObject); // Чтобы сервис не уничтожался при смене сцен
-        }
-        else
-        {
-            Destroy(gameObject);
-        }
+	[SerializeField] private InputReader _inputReader;
 
-        // Настройка кнопок
-        if (continueButton != null)
-        {
-            continueButton.onClick.AddListener(ResumeGame);
-        }
+	private bool isPaused = false;
 
-        if (exitButton != null)
-        {
-            exitButton.onClick.AddListener(ExitGame);
-        }
+	private void Awake()
+	{
+		// Реализация singleton: убедимся, что только один экземпляр
+		if (Instance == null)
+		{
+			Instance = this;
+			DontDestroyOnLoad(gameObject); // Чтобы сервис не уничтожался при смене сцен
+		}
+		else
+		{
+			Destroy(gameObject);
+		}
 
-        // Изначально скрываем панель паузы
-        if (pausePanel != null)
-        {
-            pausePanel.SetActive(false);
-        }
-    }
+		// Настройка кнопок
+		if (continueButton != null)
+		{
+			continueButton.onClick.AddListener(ResumeGame);
+		}
 
-    /// <summary>
-    /// Запустить паузу
-    /// </summary>
-    public void PauseGame()
-    {
-        if (!isPaused)
-        {
-            _inputReader.EnableUI();
+		if (exitButton != null)
+		{
+			exitButton.onClick.AddListener(ExitGame);
+		}
 
-            isPaused = true;
-            Time.timeScale = 0f; // Остановить время в игре
-            if (pausePanel != null)
-            {
-                pausePanel.SetActive(true); // Показать панель паузы
-            }
-        }
-    }
+		// Изначально скрываем панель паузы
+		if (pausePanel != null)
+		{
+			pausePanel.SetActive(false);
+		}
+	}
 
-    /// <summary>
-    /// Возобновить игру
-    /// </summary>
-    public void ResumeGame()
-    {
-        if (isPaused)
-        {
-            _inputReader.EnableGameplay();
+	/// <summary>
+	/// Запустить паузу
+	/// </summary>
+	public void PauseGame()
+	{
+		if (!isPaused)
+		{
+			_inputReader.EnableUI();
 
-            isPaused = false;
-            Time.timeScale = 1f; // Возобновить время
-            if (pausePanel != null)
-            {
-                pausePanel.SetActive(false); // Скрыть панель
-            }
-        }
-    }
+			isPaused = true;
+			Time.timeScale = 0f; // Остановить время в игре
+			if (pausePanel != null)
+			{
+				pausePanel.SetActive(true); // Показать панель паузы
+			}
+		}
+	}
 
-    /// <summary>
-    /// Выйти из игры
-    /// </summary>
-    public void ExitGame()
-    {
-        // В редакторе Unity это остановит play mode, в билде выйдет из приложения
+	/// <summary>
+	/// Возобновить игру
+	/// </summary>
+	public void ResumeGame()
+	{
+		if (isPaused)
+		{
+			_inputReader.EnableGameplay();
+
+			isPaused = false;
+			Time.timeScale = 1f; // Возобновить время
+			if (pausePanel != null)
+			{
+				pausePanel.SetActive(false); // Скрыть панель
+			}
+		}
+	}
+
+	/// <summary>
+	/// Выйти из игры
+	/// </summary>
+	public void ExitGame()
+	{
+		// В редакторе Unity это остановит play mode, в билде выйдет из приложения
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+		UnityEditor.EditorApplication.isPlaying = false;
 #else
-        Application.Quit();
+		Application.Quit();
 #endif
-    }
-    
+	}
+
 }

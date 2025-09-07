@@ -1,19 +1,21 @@
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class Bootstrapper : MonoBehaviour
 {
-	// [SerializeField] интерфейс не может быть 
-	// private IService testService = new TestService();
-	
 	public static Bootstrapper Instance;
 
 	[SerializeField] private string SceneName = "SampleScene";
 
-	public List<IService> allServices = new List<IService>() { new TestService(), new TestService2() };
+	public List<IService> allServices = new List<IService>()
+	{
+		new TestService(),
+		new TestService2()
+	};
 
-	private void Awake()
+	private async void Awake()
 	{
 		if (Instance == null)
 		{
@@ -23,34 +25,51 @@ public class Bootstrapper : MonoBehaviour
 		else
 		{
 			Destroy(gameObject);
+			return;
 		}
-		
-		// allServices.Add(testService);
+
+		await InitializeServices();
+
+		// SceneManager.LoadScene(SceneName);
+		SceneManager.LoadScene(SceneName, LoadSceneMode.Additive); // TODO SceneLoaderService
+	}
+
+	// private async Task InitializeServices()
+	// {
+	// 	foreach (IService service in allServices)
+	// 	{
+	// 		await service.InitializeAsync();
+	// 	}
+	// }
+
+	private async Task InitializeServices()
+	{
+		var tasks = new List<Task>();
 
 		foreach (IService service in allServices)
 		{
-			service.Initialize();
+			tasks.Add(service.InitializeAsync());
 		}
 
-		// DontDestroyOnLoad(gameObject);
-
-		SceneManager.LoadScene(SceneName);
+		await Task.WhenAll(tasks);
 	}
 }
 
 public interface IService
 {
-	public void Initialize();
-	public void Test();
+	Task InitializeAsync();
+	void Test();
 }
 
 public class TestService : IService
 {
-	public void Initialize()
+	public async Task InitializeAsync()
 	{
-		Debug.Log("TestService Initialize");
+		Debug.Log("TestService init started...");
+		await Task.Delay(500);
+		Debug.Log("TestService init finished!");
 	}
-	
+
 	public void Test()
 	{
 		Debug.Log("TestService");
@@ -59,12 +78,14 @@ public class TestService : IService
 
 public class TestService2 : IService
 {
-	public void Initialize()
+	public async Task InitializeAsync()
 	{
-		Debug.Log("TestService2 Initialize");
+		Debug.Log("TestService2 init started...");
+		await Task.Delay(3000); // имитация дольше
+		Debug.Log("TestService2 init finished!");
 	}
-	
-		public void Test()
+
+	public void Test()
 	{
 		Debug.Log("TestService2");
 	}

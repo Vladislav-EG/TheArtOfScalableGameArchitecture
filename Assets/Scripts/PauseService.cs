@@ -25,7 +25,7 @@ public class PauseService : MonoBehaviour
 		if (Instance == null)
 		{
 			Instance = this;
-			DontDestroyOnLoad(gameObject); // Чтобы сервис не уничтожался при смене сцен
+			// DontDestroyOnLoad(gameObject); // Чтобы сервис не уничтожался при смене сцен
 		}
 		else
 		{

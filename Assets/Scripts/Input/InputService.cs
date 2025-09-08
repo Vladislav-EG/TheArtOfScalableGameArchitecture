@@ -1,14 +1,15 @@
 using System;
+using System.Threading.Tasks;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
-public class InputService : MonoBehaviour
+public class InputService : MonoBehaviour, IService
 {
 	public PlayerInputReader Player { get; private set; }
 	public UIInputReader UI { get; private set; }
 	public PlayerInputActions PlayerInputActions { get; private set; }
 
-	private void Awake()
+	public async Task InitializeAsync()
 	{
 		PlayerInputActions = new PlayerInputActions();
 
@@ -19,6 +20,21 @@ public class InputService : MonoBehaviour
 		PlayerInputActions.UI.SetCallbacks(UI);
 
 		EnableGameplay();
+		
+		await Task.CompletedTask; // Фиктивный await, чтобы убрать warning
+	}
+
+	private void Awake()
+	{
+		// PlayerInputActions = new PlayerInputActions();
+
+		// Player = new PlayerInputReader();
+		// UI = new UIInputReader();
+
+		// PlayerInputActions.Player.SetCallbacks(Player);
+		// PlayerInputActions.UI.SetCallbacks(UI);
+
+		// EnableGameplay();
 	}
 
 	public void EnableGameplay()

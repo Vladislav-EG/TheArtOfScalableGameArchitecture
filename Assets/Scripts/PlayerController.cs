@@ -36,6 +36,8 @@ public class PlayerController : MonoBehaviour
 	
 	private void Awake()
 	{
+		_inputService = ServiceLocator.Get<InputService>(); // FIXME
+		
 		_idleState = new IdleState();
 		_walkState = new WalkState(_rigidbody);
 		_jumpState = new JumpState(_rigidbody, transform);
@@ -148,6 +150,7 @@ public class PlayerController : MonoBehaviour
 	private void LateUpdate()
 	{
 		_inputService.ResetFrameStates();
+		
 	}
 }
 

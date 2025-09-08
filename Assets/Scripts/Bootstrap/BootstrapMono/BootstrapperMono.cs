@@ -12,6 +12,8 @@ public class BootstrapperMono : MonoBehaviour
 
 	[SerializeField] private List<ScriptableObject> _scriptableServices = new List<ScriptableObject>();
 
+	public static event Action OnBootstrapCompleted; 
+
 	private List<Type> _plainServiceTypes = new List<Type>
 	{
 		typeof(TestService),
@@ -30,8 +32,13 @@ public class BootstrapperMono : MonoBehaviour
 		Debug.Log("The loading of services is completed");
 
 		// SceneManager.LoadScene(SceneName, LoadSceneMode.Additive); // TODO: SceneLoaderService
-
+		
+		OnBootstrapCompleted?.Invoke();
+		
+		// await Task.Delay(500); // имитация дольше
+		
 		string sceneToLoad = GameBootstrap.RequestedScene ?? SceneName;
+		
 		SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
 	}
 
@@ -96,12 +103,12 @@ public static class GameBootstrap
 
 		if (activeScene != "BootstrapScene")
 		{
-			RequestedScene = activeScene; 
+			RequestedScene = activeScene;
 			SceneManager.LoadScene("BootstrapScene");
 		}
 		else
 		{
-			RequestedScene = null; 
+			RequestedScene = null;
 		}
 	}
 }

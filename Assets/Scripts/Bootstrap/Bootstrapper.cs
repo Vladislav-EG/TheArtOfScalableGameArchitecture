@@ -73,7 +73,6 @@ public class Bootstrapper : MonoBehaviour
 public interface IService
 {
 	Task InitializeAsync();
-	void Test();
 }
 
 public class TestService : IService

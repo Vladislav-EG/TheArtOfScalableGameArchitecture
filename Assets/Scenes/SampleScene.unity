@@ -720,7 +720,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1340050534
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -764,7 +764,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1445761653
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -780,7 +780,7 @@ MonoBehaviour:
   pausePanel: {fileID: 0}
   continueButton: {fileID: 0}
   exitButton: {fileID: 0}
-  _inputService: {fileID: 1340050534}
+  _inputService: {fileID: 0}
 --- !u!4 &1445761654
 Transform:
   m_ObjectHideFlags: 0
@@ -805,7 +805,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1505914108}
-  - component: {fileID: 1505914107}
+  - component: {fileID: 1505914109}
   m_Layer: 0
   m_Name: BootstrapTest
   m_TagString: Untagged
@@ -813,18 +813,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1505914107
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1505914106}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4c51ecaf86bfa4e08834951f89fe2806, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
 --- !u!4 &1505914108
 Transform:
   m_ObjectHideFlags: 0
@@ -840,6 +828,18 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1505914109
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1505914106}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29add350e42c845efbd30f102ab0b7db, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1588244488
 GameObject:
   m_ObjectHideFlags: 0
@@ -1156,7 +1156,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 64
   _fsmAnimator: {fileID: 1035950604}
-  _inputService: {fileID: 1340050534}
+  _inputService: {fileID: 0}
 --- !u!1 &1963970332
 GameObject:
   m_ObjectHideFlags: 0
@@ -1173,7 +1173,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!114 &1963970333
 MonoBehaviour:
   m_ObjectHideFlags: 0

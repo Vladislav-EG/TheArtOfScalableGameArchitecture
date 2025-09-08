@@ -16,10 +16,19 @@ public class GameplayState : StateBase<string>
 {
 	public GameplayState(bool needsExitTime = false, bool isGhostState = false) : base(needsExitTime, isGhostState) { }
 
+	private PauseService _pauseService;
+
+	public override void Init()
+	{
+		Debug.Log("ADASDSADSA");
+		_pauseService = ServiceLocator.Get<PauseService>();
+	}
+
 	public override void OnEnter()
 	{
 		DebugColorLog.LogEnter<GameplayState>();
-		PauseService.Instance.ResumeGame();
+		_pauseService.ResumeGame();
+		// PauseService.Instance.ResumeGame();
 	}
 }
 
@@ -27,10 +36,19 @@ public class PauseState : StateBase<string>
 {
 	public PauseState(bool needsExitTime = false, bool isGhostState = false) : base(needsExitTime, isGhostState) { }
 
+	private PauseService _pauseService;
+
+	public override void Init()
+	{
+		Debug.Log("ADASDSADSA");
+		_pauseService = ServiceLocator.Get<PauseService>();
+	}
+
 	public override void OnEnter()
 	{
 		DebugColorLog.LogEnter<PauseState>();
-		PauseService.Instance.PauseGame();
+		_pauseService.PauseGame();
+		// PauseService.Instance.PauseGame();
 	}
 }
 
@@ -53,7 +71,7 @@ public class GameStateMachine : MonoBehaviour, IService
 
 	// [SerializeField] private InputService _inputService; // FIXME
 
-	private InputService _inputService; 
+	private InputService _inputService;
 
 
 	private bool _bootstrapDone;
@@ -61,7 +79,7 @@ public class GameStateMachine : MonoBehaviour, IService
 
 	public async Task InitializeAsync()
 	{
-		BootstrapperMono.OnBootstrapCompleted += OnBootstrapCompleted; 
+		BootstrapperMono.OnBootstrapCompleted += OnBootstrapCompleted;
 		// BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 
 
 		_inputService = ServiceLocator.Get<InputService>();

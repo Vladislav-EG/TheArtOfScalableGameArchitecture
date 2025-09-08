@@ -318,6 +318,7 @@ MonoBehaviour:
   _monoServices:
   - {fileID: 1510044576}
   - {fileID: 1142691123}
+  - {fileID: 1950586378}
   _scriptableServices: []
 --- !u!1 &909514350
 GameObject:
@@ -480,7 +481,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d72f90cbdd7c713468c8b9ce196f1751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputService: {fileID: 1142691123}
 --- !u!4 &1510044577
 Transform:
   m_ObjectHideFlags: 0
@@ -525,10 +525,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef690e35b0624e169088c2ea7e7818dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  pausePanel: {fileID: 0}
-  continueButton: {fileID: 0}
-  exitButton: {fileID: 0}
-  _inputService: {fileID: 1142691123}
 --- !u!4 &1950586379
 Transform:
   m_ObjectHideFlags: 0

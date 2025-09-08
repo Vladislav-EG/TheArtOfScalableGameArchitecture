@@ -1,58 +1,28 @@
 using UnityEngine;
 using UnityEngine.InputSystem;
 using UnityEngine.UI;
-using UnityEngine.SceneManagement; // Если нужно для выхода, но для простоты используем Application.Quit()
+using UnityEngine.SceneManagement;
+using System.Threading.Tasks; // Если нужно для выхода, но для простоты используем Application.Quit()
 
-public class PauseService : MonoBehaviour
+public class PauseService : MonoBehaviour, IService
 {
 	// Singleton instance
-	public static PauseService Instance { get; private set; }
-
-	// UI элементы: предполагаем, что у вас есть Canvas с Panel для паузы
-	[SerializeField] private GameObject pausePanel; // Прикрепите ваш Pause Panel в инспекторе
-	[SerializeField] private Button continueButton; // Кнопка "Продолжить"
-	[SerializeField] private Button exitButton; // Кнопка "Выйти"
 
 	// [SerializeField] private InputReader _inputReader;
-	[SerializeField] private InputService _inputService;
-	
+	// [SerializeField] private InputService _inputService;
+	private InputService _inputService;
+
 
 	private bool isPaused = false;
 
-	private void Awake()
+	public async Task InitializeAsync()
 	{
-		// Реализация singleton: убедимся, что только один экземпляр
-		if (Instance == null)
-		{
-			Instance = this;
-			// DontDestroyOnLoad(gameObject); // Чтобы сервис не уничтожался при смене сцен
-		}
-		else
-		{
-			Destroy(gameObject);
-		}
-
-		// Настройка кнопок
-		if (continueButton != null)
-		{
-			continueButton.onClick.AddListener(ResumeGame);
-		}
-
-		if (exitButton != null)
-		{
-			exitButton.onClick.AddListener(ExitGame);
-		}
-
-		// Изначально скрываем панель паузы
-		if (pausePanel != null)
-		{
-			pausePanel.SetActive(false);
-		}
+		
+		_inputService = ServiceLocator.Get<InputService>();
+	
+		await Task.CompletedTask; 
 	}
 
-	/// <summary>
-	/// Запустить паузу
-	/// </summary>
 	public void PauseGame()
 	{
 		if (!isPaused)
@@ -60,17 +30,10 @@ public class PauseService : MonoBehaviour
 			_inputService.EnableUI();
 
 			isPaused = true;
-			Time.timeScale = 0f; // Остановить время в игре
-			if (pausePanel != null)
-			{
-				pausePanel.SetActive(true); // Показать панель паузы
-			}
+			Time.timeScale = 0f; 
 		}
 	}
 
-	/// <summary>
-	/// Возобновить игру
-	/// </summary>
 	public void ResumeGame()
 	{
 		if (isPaused)
@@ -78,17 +41,10 @@ public class PauseService : MonoBehaviour
 			_inputService.EnableGameplay();
 
 			isPaused = false;
-			Time.timeScale = 1f; // Возобновить время
-			if (pausePanel != null)
-			{
-				pausePanel.SetActive(false); // Скрыть панель
-			}
+			Time.timeScale = 1f;
 		}
 	}
 
-	/// <summary>
-	/// Выйти из игры
-	/// </summary>
 	public void ExitGame()
 	{
 		// В редакторе Unity это остановит play mode, в билде выйдет из приложения

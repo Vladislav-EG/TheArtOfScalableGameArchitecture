@@ -29,7 +29,10 @@ public class BootstrapperMono : MonoBehaviour
 
 		Debug.Log("The loading of services is completed");
 
-		SceneManager.LoadScene(SceneName, LoadSceneMode.Additive); // TODO: SceneLoaderService
+		// SceneManager.LoadScene(SceneName, LoadSceneMode.Additive); // TODO: SceneLoaderService
+
+		string sceneToLoad = GameBootstrap.RequestedScene ?? SceneName;
+		SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
 	}
 
 	private void CollectServices()
@@ -79,5 +82,26 @@ public class BootstrapperMono : MonoBehaviour
 			tasks.Add(service.InitializeAsync());
 		}
 		await Task.WhenAll(tasks);
+	}
+}
+
+public static class GameBootstrap
+{
+	public static string RequestedScene;
+
+	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+	private static void OnGameStart()
+	{
+		string activeScene = SceneManager.GetActiveScene().name;
+
+		if (activeScene != "BootstrapScene")
+		{
+			RequestedScene = activeScene; 
+			SceneManager.LoadScene("BootstrapScene");
+		}
+		else
+		{
+			RequestedScene = null; 
+		}
 	}
 }

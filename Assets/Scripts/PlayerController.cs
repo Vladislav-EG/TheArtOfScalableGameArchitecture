@@ -11,15 +11,15 @@ public class PlayerController : MonoBehaviour
 	// public bool IsMovingHorizontally() => Mathf.Abs(GetHorizontalDirection()) > Mathf.Epsilon; 
 	// public bool IsStandingStill() => Mathf.Abs(GetHorizontalDirection()) <= Mathf.Epsilon;
 
-	
 	[SerializeField] private Rigidbody2D _rigidbody;
 	[SerializeField] private BoxCollider2D _boxCollider;
 	[SerializeField] private LayerMask layerMask;
 	[SerializeField] private Animator _fsmAnimator;
 	// [SerializeField] private InputReader _inputReader;
-	[SerializeField] private InputService _inputService;
+	// [SerializeField] private InputService _inputService;
 	
-
+	private InputService _inputService;
+	
 	private StateMachine _stateMachine;
 	private StateMachine _groundedStateMachine;
 	private StateMachine _airborneStateMachine;

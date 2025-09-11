@@ -6,18 +6,12 @@ using System.Threading.Tasks; // Если нужно для выхода, но �
 
 public class PauseService : MonoBehaviour, IService
 {
-	// Singleton instance
-
-	// [SerializeField] private InputReader _inputReader;
-	// [SerializeField] private InputService _inputService;
 	private InputService _inputService;
-
 
 	private bool isPaused = false;
 
 	public async Task InitializeAsync()
 	{
-		
 		_inputService = ServiceLocator.Get<InputService>();
 	
 		await Task.CompletedTask; 

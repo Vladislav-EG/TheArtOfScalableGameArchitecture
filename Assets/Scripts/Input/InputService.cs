@@ -24,19 +24,6 @@ public class InputService : MonoBehaviour, IService
 		await Task.CompletedTask; // Фиктивный await, чтобы убрать warning
 	}
 
-	private void Awake()
-	{
-		// PlayerInputActions = new PlayerInputActions();
-
-		// Player = new PlayerInputReader();
-		// UI = new UIInputReader();
-
-		// PlayerInputActions.Player.SetCallbacks(Player);
-		// PlayerInputActions.UI.SetCallbacks(UI);
-
-		// EnableGameplay();
-	}
-
 	public void EnableGameplay()
 	{
 		PlayerInputActions.UI.Disable();

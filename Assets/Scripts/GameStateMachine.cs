@@ -20,7 +20,6 @@ public class GameplayState : StateBase<string>
 
 	public override void Init()
 	{
-		Debug.Log("ADASDSADSA");
 		_pauseService = ServiceLocator.Get<PauseService>();
 	}
 
@@ -40,7 +39,6 @@ public class PauseState : StateBase<string>
 
 	public override void Init()
 	{
-		Debug.Log("ADASDSADSA");
 		_pauseService = ServiceLocator.Get<PauseService>();
 	}
 
@@ -52,14 +50,6 @@ public class PauseState : StateBase<string>
 	}
 }
 
-public static class ServiceCreatePauseUI
-{
-	public static void CreatePauseUI()
-	{
-
-	}
-}
-
 public class GameStateMachine : MonoBehaviour, IService
 {
 	private StateMachine _gameStateMachine;
@@ -67,19 +57,13 @@ public class GameStateMachine : MonoBehaviour, IService
 	private BootstrapState _bootstrapState;
 	private GameplayState _gameplayState;
 	private PauseState _pauseState;
-
-
-	// [SerializeField] private InputService _inputService; // FIXME
-
 	private InputService _inputService;
-
 
 	private bool _bootstrapDone;
 
-
 	public async Task InitializeAsync()
 	{
-		BootstrapperMono.OnBootstrapCompleted += OnBootstrapCompleted;
+		Bootstrapper.OnBootstrapCompleted += OnBootstrapCompleted; // TODO Можно сделать ивентовую систему
 		// BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 
 
 		_inputService = ServiceLocator.Get<InputService>();
@@ -100,20 +84,6 @@ public class GameStateMachine : MonoBehaviour, IService
 		_bootstrapDone = true;
 		_gameStateMachine.OnLogic(); // Принудительно обнови FSM прямо здесь, чтобы переход сработал мгновенно
 									 // Или: _gameStateMachine.RequestStateChange("Gameplay"); если библиотека поддерживает
-	}
-
-	private void Awake()
-	{
-		// BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; // подписка
-
-
-		// _gameStateMachine = new StateMachine();
-
-		// CreateStates();
-		// ConfigureStates();
-		// ConfigureTransitions();
-
-		// _gameStateMachine.Init();
 	}
 
 	private void Update()

@@ -1,5 +1,15 @@
 using UnityEngine;
 
+/* SceneLoaderService
+
+1. Скачать и установить SceneReference
+2. Создать сериализуемые: список уровней и для каждого уровня список сцен
+3. Создать возможность выбирать в инспекторе сцену, которая будет активной сценой для уровня
+4. Важно сделать так чтобы при загрузке аддативных сцены, сцены которых нет выгружались, а сцены которые были оставались
+
+   */
+
+
 public static class SceneHelper
 {
 	public static void LoadScene(string s, bool additive = false, bool setActive = false)

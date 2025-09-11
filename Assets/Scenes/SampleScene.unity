@@ -678,6 +678,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ef690e35b0624e169088c2ea7e7818dc, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputService: {fileID: 0}
+  isPaused: 0
 --- !u!4 &1445761654
 Transform:
   m_ObjectHideFlags: 0
@@ -948,6 +950,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d72f90cbdd7c713468c8b9ce196f1751, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  _inputService: {fileID: 0}
+  _bootstrapDone: 0
 --- !u!4 &1963970334
 Transform:
   m_ObjectHideFlags: 0
@@ -1087,9 +1091,9 @@ SceneRoots:
   m_Roots:
   - {fileID: 519420032}
   - {fileID: 619394802}
-  - {fileID: 3584307854899199709}
   - {fileID: 1600605200}
   - {fileID: 1035950605}
   - {fileID: 1505914108}
   - {fileID: 656791234}
+  - {fileID: 3584307854899199709}
   - {fileID: 2142177677}

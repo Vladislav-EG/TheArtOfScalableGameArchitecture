@@ -43,7 +43,8 @@ public class Bootstrapper : MonoBehaviour
 
 		string sceneToLoad = GameBootstrap.RequestedScene ?? SceneName;
 
-		SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+		// SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
+		SceneHelper.LoadScene(sceneToLoad, additive: true, setActive: true);
 	}
 
 	private void CollectServices()
@@ -116,3 +117,5 @@ public static class GameBootstrap
 		}
 	}
 }
+
+

@@ -17,6 +17,8 @@ public class Bootstrapper : MonoBehaviour
 	[SerializeField] private List<ScriptableObject> _scriptableServices = new List<ScriptableObject>();
 
 	public static event Action OnBootstrapCompleted;
+	
+	private SceneLoaderService _sceneLoaderService;
 
 	private List<Type> _plainServiceTypes = new List<Type>
 	{
@@ -44,7 +46,10 @@ public class Bootstrapper : MonoBehaviour
 		string sceneToLoad = GameBootstrap.RequestedScene ?? SceneName;
 
 		// SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
-		SceneHelper.LoadScene(sceneToLoad, additive: true, setActive: true);
+		
+		_sceneLoaderService = ServiceLocator.Get<SceneLoaderService>();
+		_sceneLoaderService.Test();
+		// SceneHelper.LoadScene(sceneToLoad, additive: true, setActive: true);
 	}
 
 	private void CollectServices()

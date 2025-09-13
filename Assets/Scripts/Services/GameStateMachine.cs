@@ -50,6 +50,25 @@ public class PauseState : StateBase<string>
 	}
 }
 
+public class LoadLevelState : StateBase<string>
+{
+	public LoadLevelState(bool needsExitTime = false, bool isGhostState = false) : base(needsExitTime, isGhostState) { }
+
+	private SceneLoaderService _sceneLoaderService;
+
+	public override void Init()
+	{
+		_sceneLoaderService = ServiceLocator.Get<SceneLoaderService>();
+	}
+
+	public override void OnEnter()
+	{
+		DebugColorLog.LogEnter<LoadLevelState>();
+
+		_sceneLoaderService.Test();
+	}
+}
+
 public class GameStateMachine : MonoBehaviour, IService
 {
 	private StateMachine _gameStateMachine;
@@ -57,18 +76,30 @@ public class GameStateMachine : MonoBehaviour, IService
 	private BootstrapState _bootstrapState;
 	private GameplayState _gameplayState;
 	private PauseState _pauseState;
+	private LoadLevelState _loadLevelState;
+
 	private InputService _inputService;
 
 	private bool _bootstrapDone;
+	private bool _sceneLoadDone;
+	private bool _levelEnded;
+
+
 
 	public async Task InitializeAsync()
 	{
+		_gameStateMachine = new StateMachine();
+		
+		
 		Bootstrapper.OnBootstrapCompleted += OnBootstrapCompleted; // TODO Можно сделать ивентовую систему
-		// BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 
+																   // BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 
+		SceneLoaderService.OnSceneLoadCompleted += OnSceneLoadCompleted; // TODO Можно сделать ивентовую систему
+		// SceneLoaderService.OnLevelEnded += OnLevelEnded; // TODO Можно сделать ивентовую систему
+
+		SceneLoaderService.OnLevelEnded += () => _gameStateMachine.Trigger("LevelFinished");
 
 		_inputService = ServiceLocator.Get<InputService>();
 
-		_gameStateMachine = new StateMachine();
 
 		CreateStates();
 		ConfigureStates();
@@ -86,6 +117,20 @@ public class GameStateMachine : MonoBehaviour, IService
 									 // Или: _gameStateMachine.RequestStateChange("Gameplay"); если библиотека поддерживает
 	}
 
+	private void OnSceneLoadCompleted()
+	{
+		_sceneLoadDone = true;
+		_gameStateMachine.OnLogic(); // Принудительно обнови FSM прямо здесь, чтобы переход сработал мгновенно
+									 // Или: _gameStateMachine.RequestStateChange("Gameplay"); если библиотека поддерживает
+	}
+
+	private void OnLevelEnded()
+	{
+		_levelEnded = true;
+	}
+	
+
+
 	private void Update()
 	{
 		_gameStateMachine.OnLogic();
@@ -96,6 +141,7 @@ public class GameStateMachine : MonoBehaviour, IService
 		_gameplayState = new GameplayState();
 		_pauseState = new PauseState();
 		_bootstrapState = new BootstrapState();
+		_loadLevelState = new LoadLevelState();
 	}
 
 	private void ConfigureStates()
@@ -103,11 +149,20 @@ public class GameStateMachine : MonoBehaviour, IService
 		_gameStateMachine.AddState("Bootstrap", _bootstrapState);
 		_gameStateMachine.AddState("Gameplay", _gameplayState);
 		_gameStateMachine.AddState("Pause", _pauseState);
+		_gameStateMachine.AddState("LoadLevelState", _loadLevelState);
 	}
 
 	private void ConfigureTransitions()
 	{
-		_gameStateMachine.AddTransition("Bootstrap", "Gameplay", t => _bootstrapDone);
+		// _gameStateMachine.AddTransition("Bootstrap", "Gameplay", t => _bootstrapDone);
+
+		_gameStateMachine.AddTransition("Bootstrap", "LoadLevelState", t => _bootstrapDone);
+
+		_gameStateMachine.AddTransition("LoadLevelState", "Gameplay", t => _sceneLoadDone);
+		_gameStateMachine.AddTriggerTransition("LevelFinished", new Transition("Gameplay", "LoadLevelState"));
+		// _gameStateMachine.AddTransition("Gameplay", "LoadLevelState", t => _levelEnded);
+
+		// TODO Вынести в отдельную FSM
 		_gameStateMachine.AddTransition("Gameplay", "Pause", t => _inputService.Player.GetPauseState().WasPressedThisFrame);
 		_gameStateMachine.AddTransition("Pause", "Gameplay", t => _inputService.UI.GetPauseState().WasPressedThisFrame);
 

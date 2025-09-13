@@ -327,16 +327,24 @@ MonoBehaviour:
   _levels:
   - _levelName: LevelOne
     _scenes:
-    - asset: {fileID: 102900000, guid: 83e84b13525c747cfacafb1f5bbb52de, type: 3}
-      guid: 83e84b13525c747cfacafb1f5bbb52de
-    - asset: {fileID: 102900000, guid: 8c9cfa26abfee488c85f1582747f6a02, type: 3}
-      guid: 8c9cfa26abfee488c85f1582747f6a02
+    - _scene:
+        asset: {fileID: 102900000, guid: 83e84b13525c747cfacafb1f5bbb52de, type: 3}
+        guid: 83e84b13525c747cfacafb1f5bbb52de
+      _isActiveScene: 0
+    - _scene:
+        asset: {fileID: 102900000, guid: 8c9cfa26abfee488c85f1582747f6a02, type: 3}
+        guid: 8c9cfa26abfee488c85f1582747f6a02
+      _isActiveScene: 1
   - _levelName: LevelTwo
     _scenes:
-    - asset: {fileID: 102900000, guid: 83e84b13525c747cfacafb1f5bbb52de, type: 3}
-      guid: 83e84b13525c747cfacafb1f5bbb52de
-    - asset: {fileID: 102900000, guid: 3c81f4fde260f46c1a5f6ec579775a6c, type: 3}
-      guid: 3c81f4fde260f46c1a5f6ec579775a6c
+    - _scene:
+        asset: {fileID: 102900000, guid: 83e84b13525c747cfacafb1f5bbb52de, type: 3}
+        guid: 83e84b13525c747cfacafb1f5bbb52de
+      _isActiveScene: 0
+    - _scene:
+        asset: {fileID: 102900000, guid: 3c81f4fde260f46c1a5f6ec579775a6c, type: 3}
+        guid: 3c81f4fde260f46c1a5f6ec579775a6c
+      _isActiveScene: 1
 --- !u!1 &1510044575
 GameObject:
   m_ObjectHideFlags: 0

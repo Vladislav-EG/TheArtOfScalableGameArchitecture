@@ -5,8 +5,25 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 
 // TODO Поедлить на отдельные скрипты которые будут выполнять свою суть
-// TODO Создать SceneLoaderService
 // TODO Какой-нибудь момет с инвтом разобрать GameStateMachine.cs - Bootstrapper.OnBootstrapCompleted += OnBootstrapCompleted;
+
+
+
+/* TODO 
+
+1. Грузится бустраппер со всеми асинхронными сервисами и стейтмашиной
+2. Дальше стейт машина переходит из состояния "Boostrap" в состояние "LoadLevelState"
+
+Bootstrap to LoadLevelState
+Gameplay to LoadLevelState
+
+3. В состоянии "LoadLevelState" SceneLoaderService аддативно загружает все сцены нужного уровня
+4. Запускается след состояние ("GameplayState")
+
+
+У меня есть Level, в теории он может быть SO
+
+   */
 
 public class Bootstrapper : MonoBehaviour
 {
@@ -38,6 +55,9 @@ public class Bootstrapper : MonoBehaviour
 		Debug.Log("The loading of services is completed");
 
 		// SceneManager.LoadScene(SceneName, LoadSceneMode.Additive); // TODO: SceneLoaderService
+		
+		// await Task.Delay(2000);
+		
 
 		OnBootstrapCompleted?.Invoke();
 
@@ -47,8 +67,8 @@ public class Bootstrapper : MonoBehaviour
 
 		// SceneManager.LoadScene(sceneToLoad, LoadSceneMode.Additive);
 		
-		_sceneLoaderService = ServiceLocator.Get<SceneLoaderService>();
-		_sceneLoaderService.Test();
+		// _sceneLoaderService = ServiceLocator.Get<SceneLoaderService>();
+		// _sceneLoaderService.Test();
 		// SceneHelper.LoadScene(sceneToLoad, additive: true, setActive: true);
 	}
 

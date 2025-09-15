@@ -66,8 +66,8 @@ public class LoadLevelState : StateBase<string>
 	{
 		DebugColorLog.LogEnter<LoadLevelState>();
 		
-		
-		_sceneLoaderService.Test();
+		// _sceneLoaderService.Test();
+		_sceneLoaderService.LoadLevel();
 	}
 }
 
@@ -87,12 +87,10 @@ public class GameStateMachine : MonoBehaviour, IService
 	private bool _levelEnded;
 
 	public bool test;
-
-
+	
 	public async Task InitializeAsync()
 	{
 		_gameStateMachine = new StateMachine();
-		
 		
 		Bootstrapper.OnBootstrapCompleted += OnBootstrapCompleted; // TODO Можно сделать ивентовую систему
 																   // BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 

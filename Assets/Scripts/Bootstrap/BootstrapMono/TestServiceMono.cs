@@ -1,6 +1,5 @@
 using System.Threading.Tasks;
 using UnityEngine;
-using Eflatun.SceneReference;
 
 public class TestServiceMono : MonoBehaviour, IService
 {
@@ -37,14 +36,16 @@ public class TestServiceMono : MonoBehaviour, IService
 	{
 		if (Input.GetKeyDown(KeyCode.I) && _test)
 		{
-			_sceneLoaderService.EndLevelEvent("LevelTwo");
+			// _sceneLoaderService.EndLevelEvent("LevelTwo");
+			_sceneLoaderService.SetNextLevel();
 			_test = false;
 			_test2 = true;
 			
 		}
 		else if (Input.GetKeyDown(KeyCode.O) && _test2)
 		{
-			_sceneLoaderService.EndLevelEvent("LevelOne");
+			// _sceneLoaderService.EndLevelEvent("LevelOne");
+			_sceneLoaderService.SetNextLevel("LevelOne");
 			_test2 = false;
 			_test = true;
 		}

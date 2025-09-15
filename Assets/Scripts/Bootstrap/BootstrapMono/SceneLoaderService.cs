@@ -37,27 +37,62 @@ public class SceneLoaderService : MonoBehaviour, IService
 
 	private Level _activeLevel;
 	private string _newScene;
+	private Level _nextLevel;
+
 
 	public static event Action OnSceneLoadCompleted;
+
 	public static event Action OnLevelEnded;
 
 	public async Task InitializeAsync()
 	{
 		Debug.Log("SceneLoaderService Initialize");
 		_newScene = "LevelOne";
+		_nextLevel = _levels[0];
+		
 		await Task.CompletedTask;
 	}
 
-	public void EndLevelEvent(string nextScene)
+	// public void EndLevelEvent(string nextScene)
+	// {
+	// 	_newScene = nextScene;
+	// 	OnLevelEnded?.Invoke();
+	// }
+
+	public void SetNextLevel()
 	{
-		_newScene = nextScene;
-		OnLevelEnded?.Invoke();
+		int currentIndex = _levels.IndexOf(_activeLevel);
+
+		if (currentIndex >= 0 && currentIndex < _levels.Count - 1)
+		{
+			_nextLevel = _levels[currentIndex + 1];
+			OnLevelEnded?.Invoke();
+		}
+		else
+		{
+			Debug.Log("No more levels!");
+		}
 	}
 
-	public async void Test()
+	public void SetNextLevel(string levelName)
 	{
-		await LoadLevel(_newScene);
+		var nextLevel = _levels.Find(l => l.LevelName == levelName);
+
+		if (nextLevel != null)
+		{
+			_nextLevel = nextLevel;
+			OnLevelEnded?.Invoke();
+		}
+		else
+		{
+			Debug.Log("There is no such level!");
+		}
 	}
+
+	// public async void Test()
+	// {
+	// 	await LoadLevel(_newScene);
+	// }
 
 	// Главный метод для смены уровня
 	public async Task LoadLevel(string levelName)
@@ -76,6 +111,20 @@ public class SceneLoaderService : MonoBehaviour, IService
 		await LoadNewScenes(newLevel);
 
 		_activeLevel = newLevel;
+		OnSceneLoadCompleted?.Invoke();
+	}
+	
+	public async Task LoadLevel()
+	{		
+		if (_activeLevel == _nextLevel) return;
+
+		// Сначала выгружаем сцены, которых не будет в новом уровне
+		await UnloadScenesNotInLevel(_nextLevel);
+
+		// Затем загружаем новые сцены
+		await LoadNewScenes(_nextLevel);
+
+		_activeLevel = _nextLevel;
 		OnSceneLoadCompleted?.Invoke();
 	}
 
@@ -144,11 +193,11 @@ public class SceneLoaderService : MonoBehaviour, IService
 	public List<Level> GetAllLevels() => _levels;
 }
 
-public interface Test
-{
-	public void LoadNewLevel();
-	public void UnloadLevel();
-	public Level GetActiveLevel();
-	public bool AllSceneLoad(); // или это ивент
-	
-}
+// public interface Test
+// {
+// 	public void LoadNewLevel();
+// 	public void UnloadLevel();
+// 	public Level GetActiveLevel();
+// 	public bool AllSceneLoad(); // или это ивент
+
+// }

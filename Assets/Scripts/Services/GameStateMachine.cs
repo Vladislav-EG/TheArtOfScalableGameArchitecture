@@ -46,6 +46,7 @@ public class PauseState : StateBase<string>
 	{
 		DebugColorLog.LogEnter<PauseState>();
 		_pauseService.PauseGame();
+		
 		// PauseService.Instance.PauseGame();
 	}
 }
@@ -64,7 +65,8 @@ public class LoadLevelState : StateBase<string>
 	public override void OnEnter()
 	{
 		DebugColorLog.LogEnter<LoadLevelState>();
-
+		
+		
 		_sceneLoaderService.Test();
 	}
 }
@@ -84,6 +86,7 @@ public class GameStateMachine : MonoBehaviour, IService
 	private bool _sceneLoadDone;
 	private bool _levelEnded;
 
+	public bool test;
 
 
 	public async Task InitializeAsync()
@@ -169,3 +172,7 @@ public class GameStateMachine : MonoBehaviour, IService
 		_gameStateMachine.SetStartState("Bootstrap");
 	}
 }
+
+// Создать отдельный класс где будут разщные триггеры для окончаения лвла и и они будут триггериить событие и передавать
+// Данные в SceneLoader, который в свою очередь будет загружать нужную сцену 
+// Есть сситема событий где и находится мое событие уровня прохошелся и к нему привзываются Sceneloader и GameStateMachine

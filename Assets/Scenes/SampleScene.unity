@@ -474,7 +474,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 656791234}
-  - component: {fileID: 656791235}
   m_Layer: 0
   m_Name: DELETE
   m_TagString: Untagged
@@ -502,21 +501,6 @@ Transform:
   - {fileID: 1340050535}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &656791235
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 656791233}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5e056ff27d9d4466b83d7257609902b6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  mySceneReference:
-    asset: {fileID: 0}
-    guid: 00000000000000000000000000000000
 --- !u!1 &1035950603
 GameObject:
   m_ObjectHideFlags: 0

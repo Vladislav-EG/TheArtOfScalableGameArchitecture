@@ -24,12 +24,11 @@ public class Level
 
 	public string LevelName => _levelName;
 	public List<SceneData> Scenes => _scenes;
-	// public SceneData ActiveScene => _scenes.FirstOrDefault(s => s.IsActiveScene);
 }
 
 public interface ISceneLoaderService
 {
-	void LoadLevel(SceneReference levelName);
+	Task LoadLevel(string levelName);
 }
 
 public class SceneLoaderService : MonoBehaviour, IService
@@ -39,17 +38,13 @@ public class SceneLoaderService : MonoBehaviour, IService
 	private Level _activeLevel;
 	private string _newScene;
 
-
 	public static event Action OnSceneLoadCompleted;
-
-	public static event Action OnLevelEnded; //TODO В другом сркрипте
+	public static event Action OnLevelEnded;
 
 	public async Task InitializeAsync()
 	{
 		Debug.Log("SceneLoaderService Initialize");
-
 		_newScene = "LevelOne";
-
 		await Task.CompletedTask;
 	}
 
@@ -59,60 +54,101 @@ public class SceneLoaderService : MonoBehaviour, IService
 		OnLevelEnded?.Invoke();
 	}
 
-	public void Test()
+	public async void Test()
 	{
-		LoadLevel(_newScene);
-		// LoadLevel("LevelOne");
-
+		await LoadLevel(_newScene);
 	}
 
-	public async void LoadLevel(string levelName)
+	// Главный метод для смены уровня
+	public async Task LoadLevel(string levelName)
 	{
-		Level level = _levels.Find(l => l.LevelName == levelName);
-		_activeLevel = level;
-
-		foreach (SceneData scene in level.Scenes)
+		Level newLevel = _levels.Find(l => l.LevelName == levelName);
+		if (newLevel == null)
 		{
-			Debug.Log($"Scene - {scene.Name} loaded!");
+			Debug.LogError($"Level {levelName} not found!");
+			return;
+		}
+
+		// Сначала выгружаем сцены, которых не будет в новом уровне
+		await UnloadScenesNotInLevel(newLevel);
+
+		// Затем загружаем новые сцены
+		await LoadNewScenes(newLevel);
+
+		_activeLevel = newLevel;
+		OnSceneLoadCompleted?.Invoke();
+	}
+
+	// Выгружаем сцены, которых не будет в новом уровне
+	private async Task UnloadScenesNotInLevel(Level newLevel)
+	{
+		if (_activeLevel == null) return;
+
+		foreach (SceneData oldScene in _activeLevel.Scenes)
+		{
+			// Проверяем, есть ли эта сцена в новом уровне
+			bool sceneExistsInNewLevel = newLevel.Scenes.Exists(s => s.Name == oldScene.Name);
+
+			if (!sceneExistsInNewLevel)
+			{
+				Debug.Log($"Unloading scene: {oldScene.Name}");
+				SceneHelper.UnloadScene(oldScene.Name);
+			}
+		}
+
+		await Task.CompletedTask;
+	}
+
+	// Загружаем новые сцены
+	private async Task LoadNewScenes(Level newLevel)
+	{
+		foreach (SceneData scene in newLevel.Scenes)
+		{
+			Debug.Log($"Checking scene: {scene.Name}");
 
 			// Пропускаем, если это уже активная сцена
 			if (SceneManager.GetActiveScene().name == scene.Name)
+			{
+				Debug.Log($"Scene {scene.Name} is already active, skipping");
 				continue;
+			}
 
-			// Пропускаем, если она уже есть в Additive
+			// Пропускаем, если она уже загружена
 			if (SceneManager.GetSceneByName(scene.Name).isLoaded)
+			{
+				Debug.Log($"Scene {scene.Name} is already loaded, skipping");
 				continue;
+			}
 
-			// await SceneManager.LoadSceneAsync(scene.Name, LoadSceneMode.Additive);
+			Debug.Log($"Loading scene: {scene.Name}");
 
 			if (scene.IsActiveScene)
+			{
 				SceneHelper.LoadScene(scene.Name, additive: true, setActive: true);
-
+			}
 			else
+			{
 				SceneHelper.LoadScene(scene.Name, additive: true);
+			}
 
-
-			// await Task.Delay(5000);
-
-			await Task.CompletedTask;
+			// await Task.Delay(TimeSpan.FromSeconds(2.5f));
 		}
 
-		OnSceneLoadCompleted.Invoke();
+		await Task.CompletedTask;
 	}
 
-	// public async void Unloadlevel(string levelName)
-	// {
-	// 	if (_activeLevel == null) return;
+	// Вспомогательный метод для получения текущего активного уровня
+	public Level GetActiveLevel() => _activeLevel;
 
-	// 	Level newlevel = _levels.Find(l => l.LevelName == levelName);
+	// Вспомогательный метод для получения всех уровней
+	public List<Level> GetAllLevels() => _levels;
+}
 
-	// 	foreach (SceneData scene in _activeLevel.Scenes)
-	// 	{
-	// 		if (newlevel.Scenes.Contains(scene)) return;
-
-	// 		SceneHelper.UnloadScene(scene.Name);
-	// 	}
-
-	// 	await Task.CompletedTask;
-	// }
+public interface Test
+{
+	public void LoadNewLevel();
+	public void UnloadLevel();
+	public Level GetActiveLevel();
+	public bool AllSceneLoad(); // или это ивент
+	
 }

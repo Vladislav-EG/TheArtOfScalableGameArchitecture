@@ -46,10 +46,11 @@ public class PauseState : StateBase<string>
 	{
 		DebugColorLog.LogEnter<PauseState>();
 		_pauseService.PauseGame();
-		
+
 		// PauseService.Instance.PauseGame();
 	}
 }
+
 
 public class LoadLevelState : StateBase<string>
 {
@@ -62,12 +63,12 @@ public class LoadLevelState : StateBase<string>
 		_sceneLoaderService = ServiceLocator.Get<SceneLoaderService>();
 	}
 
-	public override void OnEnter()
+	public override async void OnEnter()
 	{
 		DebugColorLog.LogEnter<LoadLevelState>();
-		
-		// _sceneLoaderService.Test();
-		_sceneLoaderService.LoadLevel();
+
+		await _sceneLoaderService.LoadNextLevel();
+
 	}
 }
 
@@ -87,17 +88,20 @@ public class GameStateMachine : MonoBehaviour, IService
 	private bool _levelEnded;
 
 	public bool test;
-	
+
 	public async Task InitializeAsync()
 	{
 		_gameStateMachine = new StateMachine();
-		
+
 		Bootstrapper.OnBootstrapCompleted += OnBootstrapCompleted; // TODO Можно сделать ивентовую систему
 																   // BootstrapperMono.OnBootstrapCompleted += () => _bootstrapDone = true; 
-		SceneLoaderService.OnSceneLoadCompleted += OnSceneLoadCompleted; // TODO Можно сделать ивентовую систему
-		// SceneLoaderService.OnLevelEnded += OnLevelEnded; // TODO Можно сделать ивентовую систему
+		// SceneLoaderService.OnLevelLoadCompleted += OnSceneLoadCompleted; // TODO Можно сделать ивентовую систему
+																		 // SceneLoaderService.OnLevelEnded += OnLevelEnded; // TODO Можно сделать ивентовую систему
+
+		SceneLoaderService.OnLevelLoadCompleted += () => _gameStateMachine.Trigger("LevelLoadDone");
 
 		SceneLoaderService.OnLevelEnded += () => _gameStateMachine.Trigger("LevelFinished");
+		
 
 		_inputService = ServiceLocator.Get<InputService>();
 
@@ -129,7 +133,7 @@ public class GameStateMachine : MonoBehaviour, IService
 	{
 		_levelEnded = true;
 	}
-	
+
 
 
 	private void Update()
@@ -159,7 +163,9 @@ public class GameStateMachine : MonoBehaviour, IService
 
 		_gameStateMachine.AddTransition("Bootstrap", "LoadLevelState", t => _bootstrapDone);
 
-		_gameStateMachine.AddTransition("LoadLevelState", "Gameplay", t => _sceneLoadDone);
+		// _gameStateMachine.AddTransition("LoadLevelState", "Gameplay", t => _sceneLoadDone);
+		_gameStateMachine.AddTriggerTransition("LevelLoadDone", new Transition("LoadLevelState", "Gameplay"));
+		
 		_gameStateMachine.AddTriggerTransition("LevelFinished", new Transition("Gameplay", "LoadLevelState"));
 		// _gameStateMachine.AddTransition("Gameplay", "LoadLevelState", t => _levelEnded);
 

@@ -29,38 +29,46 @@ public class Level
 public interface ISceneLoaderService
 {
 	Task LoadLevel(string levelName);
+	Task LoadNextLevel();
+	void SetNextLevel();
+	void SetNextLevel(string levelName);
+	Level GetActiveLevel();
+	List<Level> GetAllLevels();
+
+	static event Action OnLevelLoadCompleted;
+	static event Action OnLevelEnded;
 }
 
-public class SceneLoaderService : MonoBehaviour, IService
+public class SceneLoaderService : MonoBehaviour, IService, ISceneLoaderService
 {
 	[SerializeField] private List<Level> _levels = new List<Level>();
 
 	private Level _activeLevel;
-	private string _newScene;
 	private Level _nextLevel;
 
-
-	public static event Action OnSceneLoadCompleted;
-
+	public static event Action OnLevelLoadCompleted;
 	public static event Action OnLevelEnded;
 
 	public async Task InitializeAsync()
 	{
 		Debug.Log("SceneLoaderService Initialize");
-		_newScene = "LevelOne";
-		_nextLevel = _levels[0];
-		
+
+		if (_levels.Count > 0)
+		{
+			_nextLevel = _levels[0];
+		}
+
 		await Task.CompletedTask;
 	}
 
-	// public void EndLevelEvent(string nextScene)
-	// {
-	// 	_newScene = nextScene;
-	// 	OnLevelEnded?.Invoke();
-	// }
-
 	public void SetNextLevel()
 	{
+		if (_activeLevel == null)
+		{
+			Debug.LogWarning("No active level set!");
+			return;
+		}
+
 		int currentIndex = _levels.IndexOf(_activeLevel);
 
 		if (currentIndex >= 0 && currentIndex < _levels.Count - 1)
@@ -70,7 +78,7 @@ public class SceneLoaderService : MonoBehaviour, IService
 		}
 		else
 		{
-			Debug.Log("No more levels!");
+			Debug.Log("No more levels available!");
 		}
 	}
 
@@ -85,60 +93,64 @@ public class SceneLoaderService : MonoBehaviour, IService
 		}
 		else
 		{
-			Debug.Log("There is no such level!");
+			Debug.LogError($"Level '{levelName}' not found!");
 		}
 	}
 
-	// public async void Test()
-	// {
-	// 	await LoadLevel(_newScene);
-	// }
-
-	// Главный метод для смены уровня
 	public async Task LoadLevel(string levelName)
 	{
-		Level newLevel = _levels.Find(l => l.LevelName == levelName);
-		if (newLevel == null)
+		Level targetLevel = _levels.Find(l => l.LevelName == levelName);
+
+		if (targetLevel == null)
 		{
-			Debug.LogError($"Level {levelName} not found!");
+			Debug.LogError($"Level '{levelName}' not found!");
 			return;
 		}
 
-		// Сначала выгружаем сцены, которых не будет в новом уровне
-		await UnloadScenesNotInLevel(newLevel);
-
-		// Затем загружаем новые сцены
-		await LoadNewScenes(newLevel);
-
-		_activeLevel = newLevel;
-		OnSceneLoadCompleted?.Invoke();
-	}
-	
-	public async Task LoadLevel()
-	{		
-		if (_activeLevel == _nextLevel) return;
-
-		// Сначала выгружаем сцены, которых не будет в новом уровне
-		await UnloadScenesNotInLevel(_nextLevel);
-
-		// Затем загружаем новые сцены
-		await LoadNewScenes(_nextLevel);
-
-		_activeLevel = _nextLevel;
-		OnSceneLoadCompleted?.Invoke();
+		await LoadLevelInternal(targetLevel);
 	}
 
-	// Выгружаем сцены, которых не будет в новом уровне
+	public async Task LoadNextLevel()
+	{
+		if (_nextLevel == null)
+		{
+			Debug.LogWarning("No next level set!");
+			return;
+		}
+
+		if (_activeLevel == _nextLevel)
+		{
+			Debug.Log("Next level is the same as active level, skipping load.");
+			return;
+		}
+
+		await LoadLevelInternal(_nextLevel);
+	}
+
+	private async Task LoadLevelInternal(Level targetLevel)
+	{
+		Debug.Log($"Loading level: {targetLevel.LevelName}");
+
+		await UnloadScenesNotInLevel(targetLevel);
+		await LoadNewScenes(targetLevel);
+
+		_activeLevel = targetLevel;
+
+		Debug.Log($"Level '{targetLevel.LevelName}' loaded successfully");
+		
+		OnLevelLoadCompleted?.Invoke();
+
+	}
+
 	private async Task UnloadScenesNotInLevel(Level newLevel)
 	{
 		if (_activeLevel == null) return;
 
 		foreach (SceneData oldScene in _activeLevel.Scenes)
 		{
-			// Проверяем, есть ли эта сцена в новом уровне
 			bool sceneExistsInNewLevel = newLevel.Scenes.Exists(s => s.Name == oldScene.Name);
 
-			if (!sceneExistsInNewLevel)
+			if (!sceneExistsInNewLevel && SceneManager.GetSceneByName(oldScene.Name).isLoaded)
 			{
 				Debug.Log($"Unloading scene: {oldScene.Name}");
 				SceneHelper.UnloadScene(oldScene.Name);
@@ -148,24 +160,13 @@ public class SceneLoaderService : MonoBehaviour, IService
 		await Task.CompletedTask;
 	}
 
-	// Загружаем новые сцены
 	private async Task LoadNewScenes(Level newLevel)
 	{
 		foreach (SceneData scene in newLevel.Scenes)
 		{
-			Debug.Log($"Checking scene: {scene.Name}");
-
-			// Пропускаем, если это уже активная сцена
-			if (SceneManager.GetActiveScene().name == scene.Name)
+			if (IsSceneAlreadyLoadedOrActive(scene.Name))
 			{
-				Debug.Log($"Scene {scene.Name} is already active, skipping");
-				continue;
-			}
-
-			// Пропускаем, если она уже загружена
-			if (SceneManager.GetSceneByName(scene.Name).isLoaded)
-			{
-				Debug.Log($"Scene {scene.Name} is already loaded, skipping");
+				Debug.Log($"Scene '{scene.Name}' is already loaded, skipping");
 				continue;
 			}
 
@@ -180,24 +181,19 @@ public class SceneLoaderService : MonoBehaviour, IService
 				SceneHelper.LoadScene(scene.Name, additive: true);
 			}
 
-			// await Task.Delay(TimeSpan.FromSeconds(2.5f));
+			await Task.Delay(500);
+
 		}
 
 		await Task.CompletedTask;
 	}
 
-	// Вспомогательный метод для получения текущего активного уровня
-	public Level GetActiveLevel() => _activeLevel;
+	private bool IsSceneAlreadyLoadedOrActive(string sceneName)
+	{
+		return SceneManager.GetActiveScene().name == sceneName ||
+			   SceneManager.GetSceneByName(sceneName).isLoaded;
+	}
 
-	// Вспомогательный метод для получения всех уровней
+	public Level GetActiveLevel() => _activeLevel;
 	public List<Level> GetAllLevels() => _levels;
 }
-
-// public interface Test
-// {
-// 	public void LoadNewLevel();
-// 	public void UnloadLevel();
-// 	public Level GetActiveLevel();
-// 	public bool AllSceneLoad(); // или это ивент
-
-// }

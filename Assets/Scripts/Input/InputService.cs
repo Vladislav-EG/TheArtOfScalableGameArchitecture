@@ -20,7 +20,7 @@ public class InputService : MonoBehaviour, IService
 		PlayerInputActions.UI.SetCallbacks(UI);
 
 		EnableGameplay();
-		
+
 		await Task.CompletedTask; // Фиктивный await, чтобы убрать warning
 	}
 
@@ -40,6 +40,12 @@ public class InputService : MonoBehaviour, IService
 	{
 		PlayerInputActions.Player.Enable();
 		PlayerInputActions.UI.Enable();
+	}
+
+	public void DisableAll()
+	{
+		PlayerInputActions.Player.Disable();
+		PlayerInputActions.UI.Disable();
 	}
 
 	private void OnEnable() => PlayerInputActions.Enable();

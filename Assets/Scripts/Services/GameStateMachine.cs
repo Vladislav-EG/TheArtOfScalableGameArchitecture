@@ -5,7 +5,7 @@ using UnityHFSM;
 public class BootstrapState : StateBase<string>
 {
 	public BootstrapState(bool needsExitTime = false, bool isGhostState = false) : base(needsExitTime, isGhostState) { }
-
+	
 	public override void OnEnter()
 	{
 		DebugColorLog.LogEnter<BootstrapState>();
@@ -68,7 +68,6 @@ public class LoadLevelState : StateBase<string>
 		DebugColorLog.LogEnter<LoadLevelState>();
 
 		await _sceneLoaderService.LoadNextLevel();
-
 	}
 }
 

@@ -1,5 +1,3 @@
-# Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры
-
 <h1 align="center">Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры</h1>
 
 <p align="center">
@@ -16,9 +14,9 @@
     /></a>
   &nbsp;
   <!-- Unity version -->
-  <a href="https://unity3d.com/"
+  <a href="https://open.spotify.com/album/5CnpZV3q5BcESefcB3WJmz"
      style="text-decoration: none;"><img
-      src="https://img.shields.io/badge/Unity-6000.0.38f1-6243c4?style=flat&logo=unity"
+      src="https://img.shields.io/badge/Spotify-Donda-6243c4?style=flat&logo=spotify&logoColor=white"
       alt="Unity badge"
       style="border: none;"/></a>
   &nbsp;

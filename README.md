@@ -392,5 +392,5 @@ Bootstrap Scene, сервисы, машины состояний, SceneLoaderSer
 Если у вас есть советы, интересный материал или вы видите ошибки, пожалуйста напишите, мне будет приятно услышать фидбек и стать лучше!
 
 <p align="center">
-    <img src="Assets/ForGithub/backTest.png" alt="back" />
+    <img src="Assets/ForGithub/backTest.png" alt="backTest" />
 </p>

@@ -1,5 +1,34 @@
 # Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры
 
+<h1 align="center">Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры</h1>
+
+<p align="center">
+    <img src="Assets/ForGithub/logo.png" alt="logo" />
+</p>
+
+<p align="center">
+  <!-- GitHub profile -->
+  <a href="https://github.com/Vladislav-EG"
+     style="text-decoration: none;"><img
+      src="https://img.shields.io/static/v1?style=flat&label=GitHub&message=Vladislav-EG&color=6243c4&logo=github"
+      alt="GitHub badge"
+      style="border: none;"
+    /></a>
+  &nbsp;
+  <!-- Unity version -->
+  <a href="https://unity3d.com/"
+     style="text-decoration: none;"><img
+      src="https://img.shields.io/badge/Unity-6000.0.38f1-6243c4?style=flat&logo=unity"
+      alt="Unity badge"
+      style="border: none;"/></a>
+  &nbsp;
+  <!-- Itch.io profile -->
+  <a href="https://itch.io/profile/ilovevladislav"style="text-decoration: none;"><img
+      src="https://img.shields.io/static/v1?style=flat&label=Itch.io&message=ilovevladislav&color=6243c4&logo=Itch.io&logoColor=white"
+      alt="Itch.io badge"
+      style="border: none;"/></a>
+</p>
+
 # About
 
 **Добрый день читатель.**   

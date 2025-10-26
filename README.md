@@ -3,7 +3,7 @@
 <h1 align="center">Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры</h1>
 
 <p align="center">
-    <img src="Assets/ForGithub/logoTest.png" alt="logo" />
+    <img src="Assets/ForGithub/logoTest2.png" alt="logo" />
 </p>
 
 <p align="center">

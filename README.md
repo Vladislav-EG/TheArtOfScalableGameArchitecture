@@ -252,7 +252,6 @@ machine.AddTransition(AnyState, DeathState, () => player.Health <= 0);
 - **GameplayScene**: GlobalEnv, Lighting, Player;
 - **Level1Scene**: Level1Core, Level1_Env, Level1_Enemies;
 - **Level2Scene**: Level2Core, Level2_Env, Level2_Enemies;
-- 
   <img src="Assets/ForGithub/SceneLoader.svg" alt="Grid" height="300">
 
 Видно, как набор сцен: **BoostrapScene**, **GameplayScene**, **Level1Scene**, превращаются в один **уровень** - **Level1**
@@ -267,8 +266,8 @@ machine.AddTransition(AnyState, DeathState, () => player.Health <= 0);
 
 Unity не позволяет активировать сцену в тот же кадр, в котором она была загружена — нужно подождать один кадр.
 Решения и утилиты для этого можно найти здесь:  
-[**SceneHelper_Kurtdekker**](https://gist.github.com/kurtdekker/862da3bc22ee13aff61a7606ece6fdd3)   
-[**CallAfterDelay_Kurtdekker**](https://gist.github.com/kurtdekker/0da9a9721c15bd3af1d2ced0a367e24e)
+- [**SceneHelper_Kurtdekker**](https://gist.github.com/kurtdekker/862da3bc22ee13aff61a7606ece6fdd3)   
+- [**CallAfterDelay_Kurtdekker**](https://gist.github.com/kurtdekker/0da9a9721c15bd3af1d2ced0a367e24e)
 
 > [!TIP]
 > Информацию о работе, преимуществах, недостатках, услышать советы можно на форуме Unity, конкретно
@@ -315,7 +314,6 @@ Unity не позволяет активировать сцену в тот же
 # EventSystem
 
 
-
 # Взаимодействие систем
 
 Выше были рассмотрены все ключевые компоненты архитектуры: 
@@ -324,34 +322,49 @@ Bootstrap Scene, сервисы, машины состояний, SceneLoaderSer
 должны дополнять друг друга, а не нагружать архитектуру. 
 Я опишу их работу как единый поток, начиная с инициализации и переходя к runtime-работе.
 
-1. Все начинается с запуска **Bootstrap Scene**. Это фундамент, где инициализируется **GameStateMachine** и запускается состояние **BoostrapState**, 
-создается **DI Container** или **ServiceLocator**, здесь регистрируются все core-сервисы(например, SceneLoaderService, 
-SaveLoadService, EventManager) и gameplay-сервисы (InputService, AudioService). Если используется Singleton, сервисы просто 
-инстанцируются здесь как MonoBehaviour или статические классы. DI-контейнер (например, Zenject) 
-"внедряет" зависимости автоматически: SceneLoaderService получает ссылку на Addressables для асинхронной загрузки ассетов.
+1. **Запуск Bootstrap Scene как точки входа.** Все начинается с запуска **Bootstrap Scene**, как точки входа в приложение. 
+2. **Создание и инициализация GameStateMachine.** В **Bootstrap Scene** создаётся и инициализируется **GameStateMachine**. Это будущий "мозг" игры, который управляет 
+глобальным состоянием, каждого этапа в игре. GameStateMachine настраивается с иерархией состояний 
+(BootstrapState, MenuState с подсостояниями, LoadingState, GameplayState и т.д.).
+3. **Запуск BootstrapState в GameStateMachine и инициализация сервисов.** **GameStateMachine** переходит в начальное состояние — **BootstrapState**. Это состояние отвечает за базовую инициализацию 
+базовую, последовательную, четкую инициализацию игры. В этом состоянии создаются **DI Container**, **ServiceLocator** и в них
+регистрируются и инициализируются в строгом порядке (зависит от ситуации) глобальные сервисы: 
+**core-сервисы** (SceneLoaderService, SaveLoadService, EventService), затем **gameplay-сервисы** (InputService, AudioService, UIService).
+**DI** автоматически внедряет зависимости (например, SceneLoaderService получает доступ к **Addressables** для асинхронной загрузки). 
+Это разделяет ответственность и упрощает тестирование.
+4. **Переход из BootState в следующие состояния.** После инициализации сервисов, проверки условия перехода из состояния в стояния (все сервисы верно инициализированы), 
+**GameStateMachine** выходит из **BootstrapState** и переходит в следующее состояние (например, **MenuState**). 
+5. **Загрузка сцен через SceneLoaderService.** В состояниях вроде **LoadingState** **GameStateMachine** вызывает **SceneLoaderService** (уже инициализированный) 
+для асинхронной загрузки аддитивных сцен. Например, для уровня: загружаются **GameplayScene** (с Player, Lighting) и 
+**Level1Scene** (с окружением, врагами). **Addressables** интегрируется: **SceneLoader** запрашивает ассеты по адресам, 
+кэшируя общие (UI, звуки). Если нужно последовательная загрузка, сервис ждёт завершения предыдущей сцены.
+6. **Коммуникация через EventSystem.** На протяжении всей работы игры **EventSystem** служит **клеем**, который позволяет настроить обмен между сервисами и объектами на
+сценах. Например, сервисы подписываются на событие **SceneLoaded**, и при его отработке **GameStateMachine** знает когда 
+нужно переходить в следующие состояние.
+7. **Обработка переходов между уровнями.** При смене состояний (например, из **GameplayState** уровня 1 в уровень 2) **GameStateMachine** сигнализирует 
+**SceneLoaderService** выгрузить ненужные сцены (только **Level1Scene**, оставляя **Bootstrap** и **Gameplay**). 
+**Addressables** освобождает память, выгружая ассеты. **EventSystem** уведомляет сервисы (**AudioService** проигрывает 
+переходные звуки, **SaveLoadService** сохраняет прогресс).
+8. **Завершение цикла**. В последнем состоянии **GameOverState**, GameStateMachine вызывает сервисы для отчистки: **SaveLoadService** 
+сохраняет данные, **SceneLoader** выгружает всё кроме **Bootstrap**. **EventSystem** рассылает "GameEnded", 
+завершая локальные машины.
+
+Данный алгоритм делает архитектуру последовательной, прозрачной, оптимизированной и предсказуемой, можно всегда понять, что и когда работает,
+удобно добавлять сервисы, механики и дебажить их. Если говорить кратко, то **Bootstrap** запускает, 
+**GameStateMachine** оркестрирует, **сервисы** поддерживают, **SceneLoader + Addressables** оптимизируют, **EventSystem** связывает.
 
 
-graph TD
-A[Bootstrap Scene] -->|Загружается первой| B[Создаёт GameStateMachine]
-B -->|Переходит в| C[BootState]
-C -->|Инициализирует по порядку| D[Сервисы: Core, Gameplay, Optional]
-D -->|Зависимости через DI/Locator| E[Переход в LoadingState]
-E -->|Вызывает| F[SceneLoaderService + Addressables]
-F -->|Загружает аддитивные сцены| G[GameplayState]
-G -->|Делегирует через EventSystem| H[Локальные StateMachine (AI, Player)]
-H -->|События и переходы| I[Переходы уровней: Выгрузка/Загрузка]
-I -->|Финал| J[GameOverState: Cleanup]
-style A fill:#f9f,stroke:#333
-style D fill:#dfd,stroke:#333
-style F fill:#ddf,stroke:#333
 
 
-Я считаю, что стоит сразу реализовывать или пользоваться стейтмашиной с возможностью использования иерархии. 
-Иерархия позволяет избежать дублирования, улучшает читаемость, 
-можете попробовать создать два контроллера персонажа, который будет обладать большим количеством действий, 
-без иерархии устанете прописывать переходы между всеми состояниями. Всегда можно заходить свою, 
-но есть отличная уже сделанная со многими фишками  - Unity HFSM. Стейт машина отлично 
-подходит для реализации главного героя, основного цикла игры, интерактивных объектов, AI, UI и так далее. 
+
+
+1. Все начинается с запуска **Bootstrap Scene**. Это фундамент, где инициализируется **GameStateMachine** и запускается состояние **BoostrapState**,
+   создается **DI Container** или **ServiceLocator**, здесь регистрируются все core-сервисы(например, SceneLoaderService,
+   SaveLoadService, EventManager) и gameplay-сервисы (InputService, AudioService). Если используется Singleton, сервисы просто
+   инстанцируются здесь как MonoBehaviour или статические классы. DI-контейнер (например, Zenject)
+   "внедряет" зависимости автоматически: SceneLoaderService получает ссылку на Addressables для асинхронной загрузки ассетов.
+
+
 
 https://github.com/Inspiaaa/UnityHFSM
 

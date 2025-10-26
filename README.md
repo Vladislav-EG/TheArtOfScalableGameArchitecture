@@ -16,7 +16,7 @@
   <!-- Unity version -->
   <a href="https://open.spotify.com/album/5CnpZV3q5BcESefcB3WJmz"
      style="text-decoration: none;"><img
-      src="https://img.shields.io/badge/Spotify-Donda-6243c4?style=flat&logo=spotify&logoColor=white"
+      src="https://img.shields.io/badge/Spotify-DONDA-6243c4?style=flat&logo=spotify&logoColor=white"
       alt="Unity badge"
       style="border: none;"/></a>
   &nbsp;
@@ -29,7 +29,9 @@
 
 # About
 
-**Добрый день читатель.**   
+_**Добрый день!**_  
+
+
 **Архитектура** создаваемой вами **игры** - творческое самовыражение программиста, проявление его фантазии, видения, вдохновения, 
 как и любое другое творчество, принятие таких решений основано на опыте, базе, характере и чувственных восприятиях разработчика. 
 Ниже описано **мое видение**, я не претендую на правду в последней инстанции, думаю никто, никогда ее не найдет, я хочу поделиться
@@ -380,19 +382,15 @@ Bootstrap Scene, сервисы, машины состояний, SceneLoaderSer
 удобно добавлять сервисы, механики и дебажить их. Если говорить кратко, то **Bootstrap** запускает, 
 **GameStateMachine** оркестрирует, **сервисы** поддерживают, **SceneLoader + Addressables** оптимизируют, **EventSystem** связывает.
 
+# THE END
 
+**_Спасибо, что прочли, надеюсь данная информация окажется для вас полезной!_**
 
+По мере роста программиста, как специалиста и человека его подход к таким творческим вещам, как архитектура будет меняться, 
+поэтому я буду дополнять, исправлять, улучшать этот материал. 
 
+Если у вас есть советы, интересный материал или вы видите ошибки, пожалуйста напишите, мне будет приятно услышать фидбек и стать лучше!
 
-
-1. Все начинается с запуска **Bootstrap Scene**. Это фундамент, где инициализируется **GameStateMachine** и запускается состояние **BoostrapState**,
-   создается **DI Container** или **ServiceLocator**, здесь регистрируются все core-сервисы(например, SceneLoaderService,
-   SaveLoadService, EventManager) и gameplay-сервисы (InputService, AudioService). Если используется Singleton, сервисы просто
-   инстанцируются здесь как MonoBehaviour или статические классы. DI-контейнер (например, Zenject)
-   "внедряет" зависимости автоматически: SceneLoaderService получает ссылку на Addressables для асинхронной загрузки ассетов.
-
-
-
-https://github.com/Inspiaaa/UnityHFSM
-
-Inspiaaa/UnityHFSM: A fast, tried-and-tested hierarchical finite state machine library for Unity, designed to be easy to use yet powerful without compromising performance.
+<p align="center">
+    <img src="Assets/ForGithub/back.png" alt="logo" />
+</p>

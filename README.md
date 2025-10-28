@@ -29,81 +29,81 @@
 
 # About
 
-_**Добрый день!**_  
+_**Good Day!**_
 
-**Архитектура игры** - творческое самовыражение программиста, проявление его фантазии, видения, вдохновения, 
-как и любое другое творчество, принятие таких решений основано на опыте, базе, характере и чувственных восприятиях разработчика. 
-Ниже описано **мое видение**, я не претендую на правду в последней инстанции, уверен никто ее не найдет, я хочу поделиться
-своими наработками и услышать фидбек!
+**Game Architecture** - is a creative self-expression of a programmer, a manifestation of their imagination, vision, inspiration,
+just like any other creativity, making such decisions is based on experience, knowledge base, character, and sensory perceptions of the developer.
+Below is **my vision**, I do not claim to be the ultimate truth, I'm sure no one will find it, I want to share
+my developments and hear feedback!
 
 > [!WARNING]
-> Репозиторий реализовывает эти практики с очень плохим неотполированным кодом, это все наброски, но они работают.
- 
-**Данный репозиторий - это холст для обучения и экспериментов.**
+> The repository implements these practices with very poor, unpolished code, these are all sketches, but they work.
+
+**This repository is a canvas for learning and experiments.**
 
 > [!IMPORTANT]
-> Если у вас есть советы, предложения, возражения, дополнения пожалуйста напишите мне подскажите и исправьте, мне будет очень интересно послушать и лучше разобраться в этом вопросе.
+> If you have advice, suggestions, objections, additions, please write to me, tell me and correct me, I will be very interested to listen and better understand this issue.
 
 # Bootstrap Scene
 
-_**Bootstrap Scene - фундамент, корни будущей архитектуры, при поливе превращающиеся в цифровой сад готовых дизайнерских решений.**_
+_**Bootstrap Scene - the foundation, the roots of the future architecture, which, when watered, turn into a digital garden of ready-made design solutions.**_
 
-Наличие **Bootstrap Scene**, реализованной с помощью паттерна **Entry Point**, является ключевым элементом архитектуры проекта.
-**Bootstrap Scene** загружается первой при старте приложения и остаётся активной на протяжении всей работы игры, 
-функционируя как аддитивная базовая сцена, поверх которой загружаются остальные игровые уровни.
+The presence of a **Bootstrap Scene**, implemented using the **Entry Point** pattern, is a key element of the project's architecture.
+The **Bootstrap Scene** loads first when the application starts and remains active throughout the entire game operation,
+functioning as an additive base scene, on top of which other game levels are loaded.
 
-Её основная задача — инициализация, конфигурация и управление жизненным циклом всех базовых сервисов, необходимых для работы проекта. 
-Например, в рамках **Bootstrap Scene** создаются и запускаются следующие подсистемы:
-- **Core-сервисы**: SceneLoaderService, SaveLoadService, Logger, EventManager, GameStateMachine.
-- **Gameplay-сервисы**: InputService, AudioService, UIService и другие, отвечающие за геймплейную логику.
-- **Optional-сервисы**: аналитика, реклама, метрики, внутренняя отладка и т.п.
+Its main task is the initialization, configuration, and management of the lifecycle of all basic services necessary for the project's operation.
+For example, within the **Bootstrap Scene**, the following subsystems are created and launched:
+- **Core-services**: SceneLoaderService, SaveLoadService, Logger, EventManager, GameStateMachine.
+- **Gameplay-services**: InputService, AudioService, UIService, and others responsible for gameplay logic.
+- **Optional-services**: analytics, advertising, metrics, internal debugging, etc.
 
 > [!NOTE]
-> Выше представлены примеры подсистем и сервисов.
+> The above are examples of subsystems and services.
 
-Такой подход решает одну из ключевых проблем крупной архитектуры Unity — отсутствие гарантированного порядка инициализации объектов, 
-особенно при переходах между сценами. **Bootstrap Scene** обеспечивает строго контролируемый жизненный цикл сервисов 
-и детерминированный порядок их запуска, что делает взаимодействие между компонентами прозрачным и предсказуемым.
+This approach solves one of the key problems of large Unity architectures - the lack of a guaranteed order of object initialization,
+especially during transitions between scenes. The **Bootstrap Scene** ensures a strictly controlled lifecycle of services
+and a deterministic order of their launch, making the interaction between components transparent and predictable.
 
-Кроме того, использование **Bootstrap Scene** позволяет полностью разделить ответственность между слоями системы — геймплейными, 
-инфраструктурными и вспомогательными. Это упрощает тестирование, повторное использование кода и поддержку проекта на 
-протяжении всего его жизненного цикла.
+In addition, using the **Bootstrap Scene** allows for a complete separation of responsibilities between system layers - gameplay,
+infrastructural, and auxiliary. This simplifies testing, code reuse, and project maintenance throughout
+its entire lifecycle.
 
 > [!TIP]
-> Если вы реализуйте SceneLoaderService по примеру ниже в разделе SceneLoaderService, **Bootstrap Scene** всегда будет запускаться первой, но если
-> работайте по-другому стоит реализовать систему, которая будет запускать аддитивно Bootstrap самой первой сценой
-> и только после ее загрузки запускать все остальное.
+> If you implement SceneLoaderService as in the example below in the SceneLoaderService section, the **Bootstrap Scene** will always launch first, but if
+> you work differently, it's worth implementing a system that will launch the Bootstrap additively as the very first scene
+> and only after its loading start everything else.
 
-## Код первоначальной загрузки
+## Code for Initial Loading
 
-Код снизу позволяет загружать **Bootstrap Scene**, перед любыми другими сценами и уровнями в игре.
-Что создает так необходимую страховку, что все нужные сервисы загрузятся в правильном порядке
+The code below allows loading the **Bootstrap Scene** before any other scenes and levels in the game.
+This creates the necessary safety net that all required services will load in the correct order.
 
 ```C#
 public static class GameBootstrap
 {
-public static string RequestedScene;
+    public static string RequestedScene;
 
-	[RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
-	private static void OnGameStart()
-	{
-		string activeScene = SceneManager.GetActiveScene().name;
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void OnGameStart()
+    {
+        string activeScene = SceneManager.GetActiveScene().name;
 
-		if (activeScene != "BootstrapScene")
-		{
-			RequestedScene = activeScene;
-			SceneManager.LoadScene("BootstrapScene");
-		}
-		else
-		{
-			RequestedScene = null;
-		}
-	}
+        if (activeScene != "BootstrapScene")
+        {
+            RequestedScene = activeScene;
+            SceneManager.LoadScene("BootstrapScene");
+        }
+        else
+        {
+            RequestedScene = null;
+        }
+    }
 }
 ```
 
-По факту - некрасивый костыль, но он спасает от ситуации, когда при запуске со сцены у нее успевают прогрузится Awake, перед GameBootstrap;
-
+In fact - an ugly crutch, but it saves from the situation when launching from a scene, its Awake manages to load before GameBootstrap;
+ 
 ```C#
 [InitializeOnLoad]
 public class EditorInit
@@ -114,67 +114,67 @@ public class EditorInit
 
 # Services
 
-**Сервисы** являются основой инфраструктуры проекта — они выполняют ключевые задачи, 
-обеспечивая работу всей игры на уровне ядра и геймплея.
-Во всех проектах Unity они присутствуют, независимо от жанра или масштаба. 
-Однако важно не только то, какие сервисы используются, но и как они структурированы, инициализируются и взаимодействуют между собой,
-и остальным кодом. Про инициализацию было сказано выше, это происходит в **Bootstrap Scene**, так же может быть сервис, который будет 
-инициализироваться перед уровнем где он используется и выгружаться после его завершения.
+**Services** are the foundation of the project's infrastructure — they perform key tasks,
+ensuring the operation of the entire game at the core and gameplay levels.
+In all Unity projects, they are present, regardless of genre or scale.
+However, it's important not only which services are used, but also how they are structured, initialized, and interact with each other,
+and the rest of the code. Initialization was mentioned above; it happens in the **Bootstrap Scene**. There may also be a service that
+initializes before the level where it is used and unloads after its completion.
 
-## Подходы к внедрению сервисов
+## Approaches to Implementing Services
 
-Существует несколько распространённых подходов к внедрению и управлению сервисами:
+There are several common approaches to implementing and managing services:
 
-- **Singleton** - самый простой способ организации сервисов. Каждый сервис реализуется как синглтон, инициализуерется в Boostrap-сцене, 
-может существовать как Monobehavior-объект, либо как C# класс.
-- **ServiceLocator** - более гибкий способ, имеющий некоторую простоту Singleton и структурность, организованность DI.
-Все сервисы регистрируются в ServiceLocator, расположенном в Bootstrap-сцене (в виде MonoBehaviour или отдельного статического объекта).
-Service Locator можно инкапсулировать, чтобы ограничить область доступа и повысить читаемость, например будут отдельные локаторы для gameplay, core, debug
-- **DI Container** - DI развитие идеи ServiceLocator, основанной на принципе инверсии контроля (Inversion of Control).
-Если при использовании Service Locator объект сам запрашивает нужные зависимости, то в случае DI — зависимости "внедряются" извне (в конструктор, поля или методы). 
-Это делает систему более гибкой, тестируемой и легко расширяемой. 
-Можно реализовать свой DI, но так же есть удобные готовые решения для Unity:
+- **Singleton** - the simplest way to organize services. Each service is implemented as a singleton, initialized in the Bootstrap scene,
+  and can exist as a MonoBehaviour object or as a C# class.
+- **ServiceLocator** - a more flexible way, having some simplicity of Singleton and the structure, organization of DI.
+  All services are registered in the ServiceLocator, located in the Bootstrap scene (as a MonoBehaviour or a separate static object).
+  The Service Locator can be encapsulated to limit the scope of access and improve readability, for example, there will be separate locators for gameplay, core, debug.
+- **DI Container** - DI is a development of the ServiceLocator idea, based on the principle of inversion of control (Inversion of Control).
+  If when using Service Locator, the object itself requests the necessary dependencies, then in the case of DI — dependencies are "injected" from outside (into the constructor, fields, or methods).
+  This makes the system more flexible, testable, and easily expandable.
+  You can implement your own DI, but there are also convenient ready-made solutions for Unity:
   - Zenject
   - Reflex
   - VContainer
 
-## Примеры сервисов
+## Examples of Services
 
-Пример сервисов:
+Examples of services:
 
-- **SceneLoaderService** — отвечает за загрузку и выгрузку сцен, управление асинхронными переходами и предварительной инициализацией контента. 
-Часто работает в связке с системой Addressables или AssetBundles;
-- **AudioService** — централизованное управление звуками и музыкой: воспроизведение, кэширование, изменение громкости, кроссфейды между треками, 3D-звук и эффекты.
-- **InputService** — абстрагирует ввод от конкретных источников (клавиатура, геймпад, мобильные жесты);
-Позволяет легко адаптировать управление под разные платформы;
-- **DebugService / DeveloperConsole** — инструменты для отладки, логирования и ввода консольных команд во время разработки.
+- **SceneLoaderService** — responsible for loading and unloading scenes, managing asynchronous transitions, and pre-initializing content.
+  Often works in conjunction with the Addressables or AssetBundles system;
+- **AudioService** — centralized management of sounds and music: playback, caching, volume changes, crossfades between tracks, 3D sound, and effects.
+- **InputService** — abstracts input from specific sources (keyboard, gamepad, mobile gestures);
+  Allows easy adaptation of controls for different platforms;
+- **DebugService / DeveloperConsole** — tools for debugging, logging, and entering console commands during development.
 
 # StateMachine
 
-**State Machine** — невероятно полезный паттерн, который помогает выстроить чистую, 
-прозрачную и управляемую архитектуру поведения объектов.
+**State Machine** — an incredibly useful pattern that helps build a clean,
+transparent, and manageable architecture for object behavior.
 
-Он инкапсулирует логику каждого состояния в отдельном классе, чётко разделяет ответственность, 
-изолирует переходы и выстраивает предсказуемый порядок выполнения кода.
+It encapsulates the logic of each state in a separate class, clearly separates responsibilities,
+isolates transitions, and builds a predictable order of code execution.
 
-## Виды StateMachine
+## Types of StateMachine
 
-Существует два основных типа:
-- **Обычная State Machine** — простая последовательность состояний и переходов;  
-- **Иерархическая** — поддерживает вложенные состояния и позволяет выстраивать более сложные структуры поведения; 
+There are two main types:
+- **Ordinary State Machine** — a simple sequence of states and transitions;
+- **Hierarchical** — supports nested states and allows building more complex behavior structures;
 
 > [!TIP]
-> Перед созданием StateMachine, стоит заранее проанализировать понадобиться ли иерархия,
-чтобы не столкнуться в будущем с разросшимся количеством переходов.
+> Before creating a StateMachine, it's worth analyzing in advance whether a hierarchy will be needed,
+> so as not to face an overgrown number of transitions in the future.
 
-## Подходы к организации переходов
+## Approaches to Organizing Transitions
 
-Еще есть два варианта реализации переходов между состояниями:
+There are also two options for implementing transitions between states:
 
-1. **Локальные переходы внутри состояний**
+1. **Local transitions within states**
 
-Каждое состояние само определяет, при каких условиях оно завершает работу и в какое состояние нужно перейти.
-То есть логика переходов инкапсулирована прямо в классе состояния.
+Each state itself determines under what conditions it completes its work and to which state to transition.
+That is, the transition logic is encapsulated right in the state class.
 
 ``` C#
 public class AttackState : IState
@@ -193,203 +193,202 @@ public class AttackState : IState
 }
 ```
 
-Данный подход может подойти для простых систем, в которых не так много состояний.
+This approach may be suitable for simple systems with not too many states.
 
-2. **Централизованные переходы (предикаты, правила, Transition Map)**
+2. **Centralized transitions (predicates, rules, Transition Map)**
 
-Все переходы описываются в одном месте — обычно в отдельном конфигурационном классе.
-Состояния становятся “чистыми”: они только выполняют свою внутреннюю логику, а решение, когда и куда перейти, 
-принимает внешний контроллер на основе набора условий (предикатов).
+All transitions are described in one place — usually in a separate configuration class.
+States become “clean”: they only perform their internal logic, and the decision when and where to transition
+is made by an external controller based on a set of conditions (predicates).
 
 ``` C#
 machine.AddTransition(AttackState, IdleState, () => player.HasNoTarget);
 machine.AddTransition(AnyState, DeathState, () => player.Health <= 0);
 ```
 
-Такой подход прекрасно подойдет для больших, иерархических, масштабных систем, так как будет 
-проще контролировать возрастающие количество переходов.
+This approach is perfect for large, hierarchical, scalable systems, as it will be
+easier to control the growing number of transitions.
 
-## Библиотеки
+## Библиотеки №№№№№№№№№№№№№№№№№№№
 
-Для Unity присутствует множество библиотек с уже реализововаными машинами состояний,
-но из всех, мне приглянулась [**UnityHFSM**](https://github.com/Inspiaaa/UnityHFSM). 
-В ней понятный, структурированный, документированный код, поддержка иерархии и централизованных переходов,
-множество различных переходов.
+For Unity, there are many libraries with already implemented state machines,
+but out of all, I liked [**UnityHFSM**](https://github.com/Inspiaaa/UnityHFSM).
+It has clear, structured, documented code, support for hierarchy and centralized transitions,
+and many different transitions.
 
-# GameStateMachine
+text# GameStateMachine
 
-**GameStateMachine** — это машина состояний, которая отвечает за текущее состояние самой игры в целом.
+**GameStateMachine** — is a state machine that is responsible for the current state of the game as a whole.
 
-Как уже было сказано ранее, **State Machine** позволяет инкапсулировать логику в конкретные состояния и 
-выстраивать чёткий порядок выполнения.
-В контексте игры это особенно важно: нам нужно иметь полный контроль над тем, в каком состоянии 
-находится игра, и разделить зоны ответственности между этапами — загрузкой, меню, геймплеем и т.д.
+As mentioned earlier, **State Machine** allows encapsulating logic into specific states and
+building a clear order of execution.
+In the context of the game, this is especially important: we need to have full control over what state
+the game is in, and divide areas of responsibility between stages — loading, menu, gameplay, etc.
 
-## Пример иерархии состояний
+## Example of State Hierarchy
 
-Набор состояний, которые будут содержаться в **GameStateMachine** зависит от конкретной игры, 
-снизу показан простой пример иерархической **GameStateMachine**, в коде выше реализована подобная система.
+The set of states that will be contained in **GameStateMachine** depends on the specific game,
+below is a simple example of a hierarchical **GameStateMachine**, a similar system is implemented in the code above.
 
-- **BootState** - Инициализация игры (загрузка сервисов, систем, данных);
-- **MenuState** - Главное меню (UI, настройки);
-  - **SettingsState** - Настройки (подсостояние MenuState);
-    - **VideoSettingState** - Параметры графики;
-    - **AudioSettingState** - Звук и громкость;
-    - **ControlSettingState** - Управление и бинды;
-- **LoadingState** - Загрузка сцены, ассетов или данных перед геймплеем.
-- **GameplayState** - Основной процесс игры (управление персонажем, логика уровня);
-  - **PauseState** - Пауза, временная остановка геймплея с активным UI;
-- **GameOverState** - завершение игры (экран победы или поражения).
+- **BootState** - Game initialization (loading services, systems, data);
+- **MenuState** - Main menu (UI, settings);
+  - **SettingsState** - Settings (substate of MenuState);
+    - **VideoSettingState** - Graphics parameters;
+    - **AudioSettingState** - Sound and volume;
+    - **ControlSettingState** - Controls and bindings;
+- **LoadingState** - Loading scene, assets, or data before gameplay.
+- **GameplayState** - Main game process (character control, level logic);
+  - **PauseState** - Pause, temporary gameplay stop with active UI;
+- **GameOverState** - Game completion (victory or defeat screen).
 
-## Диаграмма GameStateMachine
+## GameStateMachine Diagram
 
-Ниже представлена диаграмма **GameStateMachine**
+Below is a diagram of **GameStateMachine**
 
 <img src="Assets/ForGithub/StateMachine.svg" alt="Grid" height="300">
 
 # SceneLoaderService
 
-**SceneLoaderService** — это сервис, отвечающий за загрузку и выгрузку сцен в игре.
-Он позволяет собирать уровни из нескольких аддитивных сцен, управлять их жизненным циклом и обеспечивать контроль 
-над тем, что и когда находится в памяти.  
-Аддитивные сцены являются мощным инструментов и дают ряд следующих преимуществ:
-- Полный контроль над тем что загружается и что выгружается;
-- Меньшее потребление памяти и простая интеграция с Addressables;
-- Обеспечивают детализацию для командной работы и позволяют избежать конфликтов слияния;
-- Возможность динамически собирать уровни и тестировать отдельные их части.
+**SceneLoaderService** — is a service responsible for loading and unloading scenes in the game.
+It allows assembling levels from multiple additive scenes, managing their lifecycle, and ensuring control
+over what and when is in memory.  
+Additive scenes are a powerful tool and provide the following advantages:
+- Full control over what is loaded and what is unloaded;
+- Lower memory consumption and easy integration with Addressables;
+- Provide detailing for team work and help avoid merge conflicts;
+- Ability to dynamically assemble levels and test their individual parts.
 
-## Алгоритм SceneLoaderService
+## SceneLoaderService Algorithm
 
-Хороший **SceneLoaderService** — это **MonoBehaviour-сервис**, находящийся в **BootstrapScene**, в него можно
-добавить объекты сцен, например с помощью [**Eflatun.SceneReference**](https://github.com/starikcetin/Eflatun.SceneReference),
-из набора сцен получаются **уровни**, каждый сцена будет грузиться **асинхронно**, если требуется последовательная
-загрузка некоторых сцен, сервис будет иметь такой функционал, тут же удобно подключить **Addressable** и 
-оптимизировать загрузку и выгрузку всех уровней. Реализация возможности выбора **активной** сцены.
-**Обязательно** стоит реализовать систему, которая позволит
-запускать нужный **уровень** в данный момент в редакторе, это позволит обеспечить комфортный дебаг уровня. 
-**Поддержка кэширования** и повторного использование общих сцен (например, UI или Lighting). 
+A good **SceneLoaderService** — is a **MonoBehaviour-service** located in **BootstrapScene**, you can
+add scene objects to it, for example, using [**Eflatun.SceneReference**](https://github.com/starikcetin/Eflatun.SceneReference),
+from a set of scenes, **levels** are obtained, each scene will load **asynchronously**, if sequential
+loading of some scenes is required, the service will have such functionality, it's also convenient to connect **Addressable** and
+optimize the loading and unloading of all levels. Implementation of the ability to select an **active** scene.
+It is **mandatory** to implement a system that will allow
+launching the required **level** at the moment in the editor, this will ensure comfortable level debugging.
+**Support for caching** and reuse of common scenes (for example, UI or Lighting).
 
 > [!TIP]
-> Отличный пример готового решения - [**Advanced Scene Manager**](https://assetstore.unity.com/packages/tools/utilities/advanced-scene-manager-174152?srsltid=AfmBOorbVN07VZpI_iMK8kcedA4OC3MseMa-Jm073xJnyZtUJhvk2hRj).
-> Это ассет, который предоставляет гибкий, удобный и визуально удобный менеджер сцен.
+> An excellent example of a ready-made solution - [**Advanced Scene Manager**](https://assetstore.unity.com/packages/tools/utilities/advanced-scene-manager-174152?srsltid=AfmBOorbVN07VZpI_iMK8kcedA4OC3MseMa-Jm073xJnyZtUJhvk2hRj).
+> This is an asset that provides a flexible, convenient, and visually appealing scene manager.
 
-## Пример уровня состоящего из аддитивных сцен
+## Example of a Level Consisting of Additive Scenes
 
-На **диаграмме** снизу можно увидеть упрощенный пример созданного уровня из сцен.  
-У нас имеется 4 сцены с тремя объектами которые входят в эти сцены:
+In the **diagram** below, you can see a simplified example of a created level from scenes.  
+We have 4 scenes with three objects that are part of these scenes:
 - **BoostrapScene**: AllServices, GameFSM, ServiceLocator / DI Container;
 - **GameplayScene**: GlobalEnv, Lighting, Player;
 - **Level1Scene**: Level1Core, Level1_Env, Level1_Enemies;
 - **Level2Scene**: Level2Core, Level2_Env, Level2_Enemies;
   <img src="Assets/ForGithub/SceneLoader.svg" alt="Grid" height="300">
 
-Видно, как набор сцен: **BoostrapScene**, **GameplayScene**, **Level1Scene**, превращаются в один **уровень** - **Level1**
-все это работает с помощью аддитивность и грузится асинхронно, при переходе ко втором уровню, где вместо
-**Level1Scene** будет **Level2Scene**, выгружается только **Level1Scene**, а все остальные сцены остаются.
+You can see how a set of scenes: **BoostrapScene**, **GameplayScene**, **Level1Scene**, turn into one **level** - **Level1**
+all this works with additivity and loads asynchronously, when transitioning to the second level, where instead of
+**Level1Scene** there will be **Level2Scene**, only **Level1Scene** is unloaded, and all other scenes remain.
 
 > [!IMPORTANT]
-> Название сцены **Level1Scene** и общий **Level1** это разные вещи, общий **Level1** - это набор сцен, 
-> **Level1Scene** - сцена, которая содержит набор объектов: Level1_Core, Level1_Env, Level1_Enemies.
- 
-## Особенности и полезные ссылки
+> The name of the scene **Level1Scene** and the general **Level1** are different things, the general **Level1** - is a set of scenes,
+> **Level1Scene** - is a scene that contains a set of objects: Level1_Core, Level1_Env, Level1_Enemies.
 
-Unity не позволяет активировать сцену в тот же кадр, в котором она была загружена — нужно подождать один кадр.
-Решения и утилиты для этого можно найти здесь:  
-- [**SceneHelper_Kurtdekker**](https://gist.github.com/kurtdekker/862da3bc22ee13aff61a7606ece6fdd3)   
+## Features and Useful Links
+
+Unity does not allow activating a scene in the same frame in which it was loaded — you need to wait one frame.
+Solutions and utilities for this can be found here:
+- [**SceneHelper_Kurtdekker**](https://gist.github.com/kurtdekker/862da3bc22ee13aff61a7606ece6fdd3)
 - [**CallAfterDelay_Kurtdekker**](https://gist.github.com/kurtdekker/0da9a9721c15bd3af1d2ced0a367e24e)
 
 > [!TIP]
-> Информацию о работе, преимуществах, недостатках, услышать советы можно на форуме Unity, конкретно
-> в этом [**топике**](https://discussions.unity.com/t/best-practices-for-communicating-between-scenes/1528964/18)
-> **Kurt-Dekker** приводит огромное количество ссылок на свои работы на эту тему (**19 ответ**).
+> Information about operation, advantages, disadvantages, to hear advice can be found on the Unity forum, specifically
+> in this [**topic**](https://discussions.unity.com/t/best-practices-for-communicating-between-scenes/1528964/18)
+> **Kurt-Dekker** provides a huge number of links to his works on this topic (**19th reply**).
 
 
 # Addressable
 
-**Addressables** — это система управления ресурсами в Unity, которая позволяет загружать и выгружать ассеты по их адресу,
-независимо от того, находятся ли они локально или на удалённом сервере (CDN).
+**Addressables** — is a resource management system in Unity that allows loading and unloading assets by their address,
+regardless of whether they are local or on a remote server (CDN).
 
-Главная идея **Addressables** — дать полный контроль над памятью и загрузкой контента во время выполнения.
-Каждый ресурс (сцена, префаб, текстура, звук) получает уникальный адрес, по которому его можно вызвать из любого места в проекте.
+The main idea of **Addressables** — is to give full control over memory and content loading at runtime.
+Each resource (scene, prefab, texture, sound) gets a unique address by which it can be called from anywhere in the project.
 
 ## Addressables + SceneLoaderService
 
-И вот тут можно увидеть одно из преимуществ хорошо спроектированной архитектуры, пакет **Addressables** и **SceneLoaderService**
-созданы друг для друга и лучше при реализации **SceneLoaderService**, задумываться о том как же приятно будет совместить
-его с **Addressables**. Данная архитектура даст ту самую гибкость и оптимизации, которая нам так необходима.
-В связке двух систем, ко всем преимуществам SceneLoaderService, добавляются преимущества **Addressables** и на выходе
-получается ряд следующих плюсов:
-- Уровни и сцены можно хранить как аддитивные адресные сцены, подгружаемые по запросу 
-- Общие ассеты (например, Player, Lighting, UI) можно кешировать и переиспользовать без повторной загрузки
-- При переходе между уровнями SceneLoaderService может выгружать старые **Addressables**, освобождая память
+And here you can see one of the advantages of a well-designed architecture, the **Addressables** package and **SceneLoaderService**
+are made for each other, and when implementing **SceneLoaderService**, it's better to think about how nice it will be to combine
+it with **Addressables**. This architecture will provide the very flexibility and optimizations that we need so much.
+In the bundle of two systems, to all the advantages of SceneLoaderService, the advantages of **Addressables** are added, and the output
+is a number of the following benefits:
+- Levels and scenes can be stored as additive addressable scenes, loaded on demand
+- Common assets (for example, Player, Lighting, UI) can be cached and reused without reloading
+- When transitioning between levels, SceneLoaderService can unload old **Addressables**, freeing up memory
 
-В результате получается система, где память всегда находится под контролем, а проект масштабируется без хаоса и утечек.
+As a result, you get a system where memory is always under control, and the project scales without chaos and leaks.
 
-## Гибкость архитектуры под тип проекта
+## Flexibility of Architecture for Project Type
 
-Важно понимать, что единого подхода к реализации связки **Addressables + SceneLoaderService** не существует - он всегда
-зависит от проекта и его структуры.  
-Например можно выделить два типа игра:
-- **Линейные игры** - игры в которых уровни идут последовательно, друг за другом, в таком проекта будет использоваться
-простая последовательная загрузка сцен. Здесь система может полностью выгружать предыдущий уровень перед загрузкой следующего,
-сохраняя минимальный объём активных ассетов в памяти.
-- **Игры с открытыми мирами** - в такой игре, сцены и ассеты подгружаются динамически, частями, 
-в зависимости от положения игрока. В этом случае система должна оставлять часть сцен активными, 
-чтобы избежать видимых подзагрузок. Как раз таки определить часть которая должна быть подгружена и является задачей художника.
+It's important to understand that there is no single approach to implementing the **Addressables + SceneLoaderService** bundle - it always
+depends on the project and its structure.  
+For example, two types of games can be distinguished:
+- **Linear games** - games in which levels go sequentially, one after another, in such a project, simple sequential scene loading will be used. Here, the system can completely unload the previous level before loading the next,
+  keeping the minimum volume of active assets in memory.
+- **Games with open worlds** - in such a game, scenes and assets are loaded dynamically, in parts,
+  depending on the player's position. In this case, the system should keep part of the scenes active,
+  to avoid visible sub-loads. Determining the part that should be sub-loaded is precisely the artist's task.
 
-Таким образом, **каждая игра нуждается в собственной реализации Addressables + SceneLoaderService** в зависимости
-от задач и потребностей.
+Thus, **each game needs its own implementation of Addressables + SceneLoaderService** depending
+on the tasks and needs.
 
 # EventSystem
 
 
-# Взаимодействие систем
+# System Interaction
 
-Выше были рассмотрены все ключевые компоненты архитектуры: 
-**Bootstrap Scene**, **сервисы**, **машины состояний**, **SceneLoaderService**, **Addressables** и **EventSystem**, теперь хочу объяснить,
-как эти системы будут взаимодействовать между собой. По моему мнению все должно работать, как **единый механизм**, 
-архитектурные решения должны дополнять, **склеивать друг друга**, а не нагружать архитектуру. 
-Я опишу их работу как единый поток, начиная с инициализации и переходя к runtime-работе.
+The key components of the architecture were discussed above:
+**Bootstrap Scene**, **services**, **state machines**, **SceneLoaderService**, **Addressables**, and **EventSystem**. Now I want to explain
+how these systems will interact with each other. In my opinion, everything should work as a **single mechanism**,
+architectural decisions should complement and **glue each other together**, rather than burden the architecture.
+I will describe their work as a single flow, starting from initialization and moving to runtime operation.
 
-1. **Запуск Bootstrap Scene как точки входа.** Все начинается с запуска **Bootstrap Scene**, как точки входа в приложение. 
-2. **Создание и инициализация GameStateMachine.** В **Bootstrap Scene** создаётся и инициализируется **GameStateMachine**. Это будущий "мозг" игры, который управляет 
-глобальным состоянием, каждого этапа в игре. **GameStateMachine** настраивается с иерархией состояний 
-(**BootstrapState**, **MenuState** с подсостояниями, **LoadingState**, **GameplayState** и т.д.).
-3. **Запуск BootstrapState в GameStateMachine и инициализация сервисов.** **GameStateMachine** переходит в начальное состояние — **BootstrapState**. Это состояние отвечает за базовую инициализацию 
-базовую, последовательную, четкую инициализацию игры. В этом состоянии создаются **DI Container**, **ServiceLocator** и в них
-регистрируются и инициализируются в строгом порядке (зависит от ситуации) глобальные сервисы: 
-**core-сервисы** (SceneLoaderService, SaveLoadService, EventService), затем **gameplay-сервисы** (**InputService**, 
-**AudioService**, **UIService**). **DI** автоматически внедряет зависимости (например, 
-**SceneLoaderService** получает доступ к **Addressables** для асинхронной загрузки). Это разделяет ответственность и упрощает тестирование.
-4. **Переход из BootState в следующие состояния.** После инициализации сервисов, проверки условия перехода из состояния в стояния (все сервисы верно инициализированы), 
-**GameStateMachine** выходит из **BootstrapState** и переходит в следующее состояние (например, **MenuState**). 
-5. **Загрузка сцен через SceneLoaderService.** В состояниях вроде **LoadingState** **GameStateMachine** вызывает **SceneLoaderService** (уже инициализированный) 
-для асинхронной загрузки аддитивных сцен. Например, для уровня: загружаются **GameplayScene** (с Player, Lighting) и 
-**Level1Scene** (с окружением, врагами). **Addressables** интегрируется: **SceneLoader** запрашивает ассеты по адресам, 
-кэшируя общие (UI, звуки). Если нужно последовательная загрузка, сервис ждёт завершения предыдущей сцены.
-6. **Коммуникация через EventSystem.** На протяжении всей работы игры **EventSystem** служит **клеем**, который позволяет настроить обмен между сервисами и объектами на
-сценах. Например, сервисы подписываются на событие **SceneLoaded**, и при его отработке **GameStateMachine** знает когда 
-нужно переходить в следующие состояние.
-7. **Обработка переходов между уровнями.** При смене состояний (например, из **GameplayState** уровня 1 в уровень 2) **GameStateMachine** сигнализирует 
-**SceneLoaderService** выгрузить ненужные сцены (только **Level1Scene**, оставляя **Bootstrap** и **Gameplay**). 
-**Addressables** освобождает память, выгружая ассеты. **EventSystem** уведомляет сервисы (**AudioService** проигрывает 
-переходные звуки, **SaveLoadService** сохраняет прогресс).
-8. **Завершение цикла**. В последнем состоянии **GameOverState**, GameStateMachine вызывает сервисы для отчистки: **SaveLoadService** 
-сохраняет данные, **SceneLoader** выгружает всё кроме **Bootstrap**. **EventSystem** рассылает "GameEnded", 
-завершая локальные машины.
+1. **Launching Bootstrap Scene as the entry point.** Everything starts with launching **Bootstrap Scene** as the entry point into the application.
+2. **Creating and initializing GameStateMachine.** In **Bootstrap Scene**, **GameStateMachine** is created and initialized. This is the future "brain" of the game, which manages
+   the global state of each stage in the game. **GameStateMachine** is configured with a hierarchy of states
+   (**BootstrapState**, **MenuState** with substates, **LoadingState**, **GameplayState**, etc.).
+3. **Launching BootstrapState in GameStateMachine and initializing services.** **GameStateMachine** transitions to the initial state — **BootstrapState**. This state is responsible for the basic initialization
+   of the basic, sequential, clear initialization of the game. In this state, **DI Container**, **ServiceLocator** are created, and in them
+   global services are registered and initialized in a strict order (depending on the situation):
+   **core-services** (SceneLoaderService, SaveLoadService, EventService), then **gameplay-services** (**InputService**,
+   **AudioService**, **UIService**). **DI** automatically injects dependencies (for example,
+   **SceneLoaderService** gets access to **Addressables** for asynchronous loading). This separates responsibilities and simplifies testing.
+4. **Transition from BootState to subsequent states.** After initializing services, checking the transition conditions from state to state (all services are correctly initialized),
+   **GameStateMachine** exits **BootstrapState** and transitions to the next state (for example, **MenuState**).
+5. **Loading scenes via SceneLoaderService.** In states like **LoadingState**, **GameStateMachine** calls **SceneLoaderService** (already initialized)
+   for asynchronous loading of additive scenes. For example, for a level: **GameplayScene** (with Player, Lighting) and
+   **Level1Scene** (with environment, enemies) are loaded. **Addressables** is integrated: **SceneLoader** requests assets by addresses,
+   caching common ones (UI, sounds). If sequential loading is needed, the service waits for the completion of the previous scene.
+6. **Communication via EventSystem.** Throughout the entire game operation, **EventSystem** serves as the **glue** that allows setting up exchanges between services and objects on
+   scenes. For example, services subscribe to the **SceneLoaded** event, and upon its triggering, **GameStateMachine** knows when
+   to transition to the next state.
+7. **Handling transitions between levels.** When changing states (for example, from **GameplayState** of level 1 to level 2), **GameStateMachine** signals
+   **SceneLoaderService** to unload unnecessary scenes (only **Level1Scene**, leaving **Bootstrap** and **Gameplay**).
+   **Addressables** frees up memory by unloading assets. **EventSystem** notifies services (**AudioService** plays
+   transition sounds, **SaveLoadService** saves progress).
+8. **Cycle completion**. In the final state **GameOverState**, GameStateMachine calls services for cleanup: **SaveLoadService**
+   saves data, **SceneLoader** unloads everything except **Bootstrap**. **EventSystem** sends "GameEnded",
+   completing local machines.
 
-Данный алгоритм делает архитектуру последовательной, прозрачной, оптимизированной и предсказуемой, можно всегда понять, что и когда работает,
-удобно добавлять сервисы, механики и дебажить их. Если говорить кратко, то **Bootstrap** запускает, 
-**GameStateMachine** оркестрирует, **сервисы** поддерживают, **SceneLoader + Addressables** оптимизируют, **EventSystem** связывает.
+This algorithm makes the architecture sequential, transparent, optimized, and predictable; you can always understand what and when is working,
+it's convenient to add services, mechanics, and debug them. In short, **Bootstrap** launches,
+**GameStateMachine** orchestrates, **services** support, **SceneLoader + Addressables** optimize, **EventSystem** connects.
 
 # THE END
 
-**_Спасибо, что прочли, надеюсь данная информация окажется для вас полезной!_**
+**_Thank you for reading, I hope this information will be useful to you!_**
 
-По мере роста программиста, как специалиста и человека его подход к таким творческим вещам, как архитектура будет меняться, 
-поэтому я буду дополнять, исправлять, улучшать этот материал. 
+As a programmer grows as a specialist and a person, their approach to such creative things as architecture will change,
+so I will supplement, correct, and improve this material.
 
-Если у вас есть советы, интересный материал, рекомендации, пожалуйста напишите, мне будет приятно услышать фидбек и стать лучше!
+If you have advice, interesting material, recommendations, please write, I will be pleased to hear feedback and become better!
 
 <p align="center">
     <img src="Assets/ForGithub/backTest.png" alt="backTest" />

@@ -286,7 +286,8 @@ We have 4 scenes with three objects that are part of these scenes:
 - **GameplayScene**: GlobalEnv, Lighting, Player;
 - **Level1Scene**: Level1Core, Level1_Env, Level1_Enemies;
 - **Level2Scene**: Level2Core, Level2_Env, Level2_Enemies;
-  <img src="Assets/ForGithub/SceneLoader.svg" alt="Grid" height="300">
+  
+<img src="Assets/ForGithub/SceneLoader.svg" alt="Grid" height="300">
 
 You can see how a set of scenes: **BoostrapScene**, **GameplayScene**, **Level1Scene**, turn into one **level** - **Level1**
 all this works with additivity and loads asynchronously, when transitioning to the second level, where instead of

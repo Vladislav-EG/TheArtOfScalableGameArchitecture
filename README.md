@@ -1,4 +1,4 @@
-<h1 align="center">Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры</h1>
+<h1 align="center">The Art of Scalable Game Architecture</h1>
 
 <p align="center">
     <img src="Assets/ForGithub/logoTest2.png" alt="logo" />
@@ -36,6 +36,8 @@ just like any other creativity, making such decisions is based on experience, kn
 Below is **my vision**, I do not claim to be the ultimate truth, I'm sure no one will find it, I want to share
 my developments and hear feedback!
 
+
+
 > [!WARNING]
 > The repository implements these practices with very poor, unpolished code, these are all sketches, but they work.
 
@@ -43,6 +45,9 @@ my developments and hear feedback!
 
 > [!IMPORTANT]
 > If you have advice, suggestions, objections, additions, please write to me, tell me and correct me, I will be very interested to listen and better understand this issue.
+
+> [!IMPORTANT]
+> RusVersion - [The Art of Scalable Game Architecture - Russian Language](README_rus.md)
 
 # Bootstrap Scene
 

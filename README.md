@@ -9,16 +9,6 @@
 <h4 align="center"> Best Practices for Creating an Upgradable, Scalable, and Optimized Game Architecture </h4>
 
 <p align="center">
-  <a href="#about">About</a> •
-  <a href="#bootstrap-scene">Bootstrap Scene</a> •
-  <a href="#download">Download</a> •
-  <a href="#credits">Credits</a> •
-  <a href="#related">Related</a> •
-  <a href="#license">License</a>
-</p>
-
-
-<p align="center">
   <!-- GitHub profile -->
   <a href="https://github.com/Vladislav-EG"
      style="text-decoration: none;"><img
@@ -39,6 +29,19 @@
       src="https://img.shields.io/static/v1?style=flat&label=Itch.io&message=ilovevladislav&color=6243c4&logo=Itch.io&logoColor=white"
       alt="Itch.io badge"
       style="border: none;"/></a>
+</p>
+
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#bootstrap-scene">Bootstrap Scene</a> •
+  <a href="#services">Services</a> •
+  <a href="#statemachine">StateMachine</a> •
+  <a href="#gamestatemachine ">GameStateMachine</a> •
+  <a href="#sceneloaderservice">SceneLoaderService</a> •
+  <a href="#addressable">Addressable</a> •
+  <a href="#eventSystem">EventSystem</a> •
+  <a href="#system-interaction">System Interaction</a> •
+  <a href="#the-end">THE END</a>
 </p>
 
 # About
@@ -235,7 +238,7 @@ but out of all, I liked [**UnityHFSM**](https://github.com/Inspiaaa/UnityHFSM).
 It has clear, structured, documented code, support for hierarchy and centralized transitions,
 and many different transitions.
 
-text# GameStateMachine
+# GameStateMachine
 
 **GameStateMachine** — is a state machine that is responsible for the current state of the game as a whole.
 

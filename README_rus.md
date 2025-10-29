@@ -1,8 +1,10 @@
-<h1 align="center">Лучшие практики для создания улучшаемой, масштабируемой, оптимизированной, архитектуры игры</h1>
-
 <p align="center">
     <img src="Assets/ForGithub/logoTest2.png" alt="logo" />
 </p>
+
+<h1 align="center">The Art of Scalable Game Architecture</h1>
+
+<h4 align="center"> Best Practices for Creating an Upgradable, Scalable, and Optimized Game Architecture </h4>
 
 <p align="center">
   <!-- GitHub profile -->
@@ -26,6 +28,20 @@
       alt="Itch.io badge"
       style="border: none;"/></a>
 </p>
+
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#bootstrap-scene">Bootstrap Scene</a> •
+  <a href="#services">Services</a> •
+  <a href="#statemachine">StateMachine</a> •
+  <a href="#gamestatemachine ">GameStateMachine</a> •
+  <a href="#sceneloaderservice">SceneLoaderService</a> •
+  <a href="#addressable">Addressable</a> •
+  <a href="#eventSystem">EventSystem</a> •
+  <a href="#system-interaction">System Interaction</a> •
+  <a href="#the-end">THE END</a>
+</p>
+
 
 # About
 

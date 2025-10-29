@@ -228,7 +228,7 @@ machine.AddTransition(AnyState, DeathState, () => player.Health <= 0);
 This approach is perfect for large, hierarchical, scalable systems, as it will be
 easier to control the growing number of transitions.
 
-## Библиотеки №№№№№№№№№№№№№№№№№№№
+## Libraries
 
 For Unity, there are many libraries with already implemented state machines,
 but out of all, I liked [**UnityHFSM**](https://github.com/Inspiaaa/UnityHFSM).

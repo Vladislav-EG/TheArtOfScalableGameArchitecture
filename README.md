@@ -1,8 +1,22 @@
-<h1 align="center">The Art of Scalable Game Architecture</h1>
+
 
 <p align="center">
     <img src="Assets/ForGithub/logoTest2.png" alt="logo" />
 </p>
+
+<h1 align="center">The Art of Scalable Game Architecture</h1>
+
+<h4 align="center"> Best Practices for Creating an Upgradable, Scalable, and Optimized Game Architecture </h4>
+
+<p align="center">
+  <a href="#about">About</a> •
+  <a href="#bootstrap-scene">Bootstrap Scene</a> •
+  <a href="#download">Download</a> •
+  <a href="#credits">Credits</a> •
+  <a href="#related">Related</a> •
+  <a href="#license">License</a>
+</p>
+
 
 <p align="center">
   <!-- GitHub profile -->
